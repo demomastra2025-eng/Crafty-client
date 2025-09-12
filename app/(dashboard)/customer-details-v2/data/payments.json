@@ -1,0 +1,72 @@
+[
+  {
+    "date": "Apr 16, 10:55AM",
+    "method": "Mobile money",
+    "paidTo": "Brydge wallet",
+    "amount": 7042129335.99,
+    "type": "credit"
+  },
+  {
+    "date": "Apr 16, 10:55AM",
+    "method": "Mobile money",
+    "paidTo": "Brydge wallet",
+    "amount": -9876543.21,
+    "type": "debit"
+  },
+  {
+    "date": "Apr 16, 10:55AM",
+    "method": "Transfer",
+    "paidTo": "Brydge wallet",
+    "amount": -864250.75,
+    "type": "debit"
+  },
+  {
+    "date": "Apr 16, 10:55AM",
+    "method": "Transfer",
+    "paidTo": "Brydge wallet",
+    "amount": 24687553.8,
+    "type": "credit"
+  },
+  {
+    "date": "Apr 16, 10:55AM",
+    "method": "Transfer",
+    "paidTo": "Brydge wallet",
+    "amount": -1234567.89,
+    "type": "debit"
+  },
+  {
+    "date": "Apr 16, 10:55AM",
+    "method": "Mobile money",
+    "paidTo": "Brydge wallet",
+    "amount": 7042129335.99,
+    "type": "credit"
+  },
+  {
+    "date": "Apr 16, 10:55AM",
+    "method": "Mobile money",
+    "paidTo": "Brydge wallet",
+    "amount": -9876543.21,
+    "type": "debit"
+  },
+  {
+    "date": "Apr 16, 10:55AM",
+    "method": "Transfer",
+    "paidTo": "Brydge wallet",
+    "amount": -864250.75,
+    "type": "debit"
+  },
+  {
+    "date": "Apr 16, 10:55AM",
+    "method": "Transfer",
+    "paidTo": "Brydge wallet",
+    "amount": 24687553.8,
+    "type": "credit"
+  },
+  {
+    "date": "Apr 16, 10:55AM",
+    "method": "Transfer",
+    "paidTo": "Brydge wallet",
+    "amount": -1234567.89,
+    "type": "debit"
+  }
+]

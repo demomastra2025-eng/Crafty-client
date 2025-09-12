@@ -1,0 +1,115 @@
+"use client";
+
+import {
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem
+} from "@/components/ui/sidebar";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import Link from "next/link";
+import { ChevronDown } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { sidebarData } from "@/@data/sidebar";
+
+export type NavMainProps = typeof sidebarData.navMain;
+
+export function NavMain({ items }: { items: NavMainProps }) {
+  const isMobile = useIsMobile();
+
+  return (
+    <SidebarGroup>
+      <SidebarGroupContent className="flex flex-col gap-2">
+        {items.map((item) => (
+          <>
+            {item.title && <SidebarGroupLabel>{item.title}</SidebarGroupLabel>}
+            <SidebarMenu>
+              {item.items.map((l, index) => (
+                <>
+                  {l?.items?.length ? (
+                    <>
+                      <div className="hidden group-data-[collapsible=icon]:block">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <SidebarMenuItem key={l.title}>
+                              <SidebarMenuButton tooltip={l.title} asChild>
+                                <Link href={l.url}>
+                                  {l.icon && <l.icon />}
+                                  <span>{l.title}</span>
+                                </Link>
+                              </SidebarMenuButton>
+                            </SidebarMenuItem>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            side={isMobile ? "bottom" : "right"}
+                            align={isMobile ? "end" : "start"}>
+                            <DropdownMenuLabel>{l.title}</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {l.items.map((z, index) => (
+                              <DropdownMenuItem key={index}>{z.title}</DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                      <div className="block group-data-[collapsible=icon]:hidden">
+                        <Collapsible
+                          key={l.title}
+                          defaultOpen={index === 1}
+                          className="group/collapsible">
+                          <SidebarMenuItem>
+                            <CollapsibleTrigger asChild>
+                              <SidebarMenuButton>
+                                {l.icon && <l.icon />}
+                                {l.title}{" "}
+                                <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                              </SidebarMenuButton>
+                            </CollapsibleTrigger>
+                            {l.items?.length ? (
+                              <CollapsibleContent>
+                                <SidebarMenuSub>
+                                  {l.items.map((item) => (
+                                    <SidebarMenuSubItem key={item.title}>
+                                      <SidebarMenuSubButton asChild isActive={false}>
+                                        <Link href={item.url}>{item.title}</Link>
+                                      </SidebarMenuSubButton>
+                                    </SidebarMenuSubItem>
+                                  ))}
+                                </SidebarMenuSub>
+                              </CollapsibleContent>
+                            ) : null}
+                          </SidebarMenuItem>
+                        </Collapsible>
+                      </div>
+                    </>
+                  ) : (
+                    <SidebarMenuItem key={l.title}>
+                      <SidebarMenuButton tooltip={l.title} asChild>
+                        <Link href={l.url}>
+                          {l.icon && <l.icon />}
+                          <span>{l.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )}
+                </>
+              ))}
+            </SidebarMenu>
+          </>
+        ))}
+      </SidebarGroupContent>
+    </SidebarGroup>
+  );
+}

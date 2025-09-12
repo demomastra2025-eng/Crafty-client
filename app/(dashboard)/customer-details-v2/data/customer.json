@@ -1,0 +1,23 @@
+{
+  "name": "John Doe",
+  "customerSince": "Apr 16, 2024",
+  "customerId": "cu3901KLWE563",
+  "customerType": "Individual",
+  "email": "johndoe@example.com",
+  "phone": "+ (234) 812 456 9898",
+  "country": "NG",
+  "billingAddress": {
+    "street": "Vision Plaza, 2nd Flr Mombasa Rd, Nairobi, 20100",
+    "country": "Kenya",
+    "phone": "+254-20828224"
+  },
+  "shippingAddress": {
+    "street": "Vision Plaza, 2nd Flr Mombasa Rd, Nairobi, 20100",
+    "country": "Kenya",
+    "phone": "+254-20828224"
+  },
+  "paymentsSummary": {
+    "totalPayments": 12,
+    "totalAmount": "126,700.00"
+  }
+}
