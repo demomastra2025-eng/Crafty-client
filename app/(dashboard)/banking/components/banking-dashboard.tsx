@@ -95,7 +95,7 @@ export default function BankingDashboard() {
               <div key={transaction.id} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={transaction.avatar || "/placeholder.svg"} />
+                    <AvatarImage src={transaction.avatar} />
                     <AvatarFallback>
                       {transaction.name
                         .split(" ")
@@ -177,7 +177,7 @@ export default function BankingDashboard() {
                 <Avatar
                   key={contact.id}
                   className="h-10 w-10 cursor-pointer hover:ring-2 hover:ring-blue-500">
-                  <AvatarImage src={contact.avatar || "/placeholder.svg"} />
+                  <AvatarImage src={contact.avatar} />
                   <AvatarFallback className="bg-gradient-to-br from-orange-400 to-orange-500 font-semibold text-white">
                     {contact.initials}
                   </AvatarFallback>

@@ -50,10 +50,7 @@ export function ConversationList({
             <div className="flex items-center space-x-3">
               <div className="relative">
                 <Avatar className="h-12 w-12">
-                  <AvatarImage
-                    src={conversation.avatar || "/placeholder.svg"}
-                    alt={conversation.name}
-                  />
+                  <AvatarImage src={conversation.avatar} alt={conversation.name} />
                   <AvatarFallback>
                     {conversation.name
                       .split(" ")

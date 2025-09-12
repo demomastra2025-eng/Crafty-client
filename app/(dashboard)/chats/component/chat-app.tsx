@@ -19,7 +19,7 @@ const conversations = [
   {
     id: "2",
     name: "Bob Smith",
-    avatar: "/placeholder.svg?height=40&width=40",
+    avatar: "https://bundui-images.netlify.app/avatars/09.png",
     lastMessage: "Can we meet tomorrow?",
     timestamp: "Yesterday",
     unreadCount: 54,
@@ -29,7 +29,7 @@ const conversations = [
   {
     id: "3",
     name: "Charlie Brown",
-    avatar: "/placeholder.svg?height=40&width=40",
+    avatar: "https://bundui-images.netlify.app/avatars/09.png",
     lastMessage: "Thanks for your help!",
     timestamp: "Tuesday",
     unreadCount: 1,
@@ -39,7 +39,7 @@ const conversations = [
   {
     id: "4",
     name: "Diana Prince",
-    avatar: "/placeholder.svg?height=40&width=40",
+    avatar: "https://bundui-images.netlify.app/avatars/09.png",
     lastMessage: "The project is done!",
     timestamp: "2 days ago",
     unreadCount: 0,
@@ -49,7 +49,7 @@ const conversations = [
   {
     id: "5",
     name: "Ethan Hunt",
-    avatar: "/placeholder.svg?height=40&width=40",
+    avatar: "https://bundui-images.netlify.app/avatars/09.png",
     lastMessage: "Mission accomplished",
     timestamp: "Last week",
     unreadCount: 0,

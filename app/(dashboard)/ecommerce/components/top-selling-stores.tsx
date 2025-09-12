@@ -17,7 +17,7 @@ const topStores = [
   {
     id: 1,
     name: "TechHub Electronics",
-    avatar: "/placeholder.svg?height=32&width=32",
+    avatar: "https://bundui-images.netlify.app/avatars/07.png",
     overallScore: 98.5,
     totalSales: 156789,
     revenue: 2340000,
@@ -30,7 +30,7 @@ const topStores = [
   {
     id: 2,
     name: "Fashion Forward",
-    avatar: "/placeholder.svg?height=32&width=32",
+    avatar: "https://bundui-images.netlify.app/avatars/07.png",
     overallScore: 94.2,
     totalSales: 134567,
     revenue: 1890000,
@@ -43,7 +43,7 @@ const topStores = [
   {
     id: 3,
     name: "Home & Garden Plus",
-    avatar: "/placeholder.svg?height=32&width=32",
+    avatar: "https://bundui-images.netlify.app/avatars/07.png",
     overallScore: 87.8,
     totalSales: 98765,
     revenue: 1560000,
@@ -56,7 +56,7 @@ const topStores = [
   {
     id: 4,
     name: "Sports Central",
-    avatar: "/placeholder.svg?height=32&width=32",
+    avatar: "https://bundui-images.netlify.app/avatars/07.png",
     overallScore: 85.6,
     totalSales: 87654,
     revenue: 1340000,
@@ -69,7 +69,7 @@ const topStores = [
   {
     id: 5,
     name: "Beauty Essentials",
-    avatar: "/placeholder.svg?height=32&width=32",
+    avatar: "https://bundui-images.netlify.app/avatars/07.png",
     overallScore: 82.3,
     totalSales: 76543,
     revenue: 1120000,
@@ -142,7 +142,7 @@ export default function TopSellingStores() {
                 <TableCell>
                   <div className="flex items-center space-x-3">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={store.avatar || "/placeholder.svg"} alt={store.name} />
+                      <AvatarImage src={store.avatar || https://bundui-images.netlify.app/avatars/08.png"} alt={store.name} />
                       <AvatarFallback>
                         <Store className="h-4 w-4" />
                       </AvatarFallback>

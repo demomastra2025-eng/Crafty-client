@@ -36,7 +36,7 @@ const properties = [
     guests: 2,
     baths: 2,
     area: "4x7 m²",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "https://bundui-images.netlify.app/avatars/07.png",
     featured: true
   },
   {
@@ -48,7 +48,7 @@ const properties = [
     guests: 2,
     baths: 2,
     area: "4x7 m²",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "https://bundui-images.netlify.app/avatars/07.png",
     featured: false
   },
   {
@@ -60,7 +60,7 @@ const properties = [
     guests: 2,
     baths: 2,
     area: "4x7 m²",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "https://bundui-images.netlify.app/avatars/07.png",
     featured: false
   },
   {
@@ -72,7 +72,7 @@ const properties = [
     guests: 2,
     baths: 2,
     area: "4x7 m²",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "https://bundui-images.netlify.app/avatars/07.png",
     featured: false
   }
 ];
@@ -246,7 +246,7 @@ export default function RealEstateListings() {
                   <div className="flex">
                     <div className="relative h-48 w-80">
                       <img
-                        src={property.image || "/placeholder.svg"}
+                        src={property.image || https://bundui-images.netlify.app/avatars/08.png"}
                         alt={property.title}
                         className="h-full w-full object-cover"
                       />

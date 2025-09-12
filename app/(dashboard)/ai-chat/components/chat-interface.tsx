@@ -34,7 +34,7 @@ export function ChatInterface({
               {message.role === "user" ? (
                 <>
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src="/placeholder.svg?height=32&width=32" />
+                    <AvatarImage src="https://bundui-images.netlify.app/avatars/01.png" />
                     <AvatarFallback>JD</AvatarFallback>
                   </Avatar>
                   <div className="flex-1">

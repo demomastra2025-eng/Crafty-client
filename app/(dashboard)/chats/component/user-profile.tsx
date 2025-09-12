@@ -30,7 +30,7 @@ export function UserProfile({ user }: UserProfileProps) {
       <div className="p-6 text-center">
         <div className="relative inline-block">
           <Avatar className="mx-auto h-20 w-20">
-            <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
+            <AvatarImage src={user.avatar || https://bundui-images.netlify.app/avatars/08.png"} alt={user.name} />
             <AvatarFallback className="text-lg">
               {user.name
                 .split(" ")
