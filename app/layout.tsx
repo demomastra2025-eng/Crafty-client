@@ -1,4 +1,5 @@
 import React from "react";
+import type { Metadata } from "next";
 
 import { Plus_Jakarta_Sans } from "next/font/google";
 import GoogleAnalyticsInit from "@/lib/ga";
@@ -10,6 +11,13 @@ const jakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   display: "swap"
 });
+
+export const metadata: Metadata = {
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png"
+  }
+};
 
 export default function RootLayout({
   children

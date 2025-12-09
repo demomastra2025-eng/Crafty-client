@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,11 +16,8 @@ export default function MessagesPanel() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button size="sm" variant="link" className="text-foreground relative">
-          <MailIcon className="animate-tada h-5 w-5" />
-          <Badge className="absolute bottom-[calc(100%-10px)] left-[calc(100%-12px)] h-4 w-4 items-center justify-center rounded-full p-0 text-[8px] font-semibold">
-            3
-          </Badge>
+        <Button size="sm" variant="link" className="text-foreground">
+          <MailIcon className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="z-999 mx-4 max-w-sm p-0 lg:w-[320px]">
@@ -63,11 +59,6 @@ export default function MessagesPanel() {
                     </div>
                   </div>
                 </div>
-                {item.hasnotifaction && (
-                  <div className="flex-0">
-                    <span className="dark:border-default-400 border-destructive-foreground bg-destructive inline-block h-[10px] w-[10px] rounded-full border" />
-                  </div>
-                )}
               </DropdownMenuItem>
             ))}
           </ScrollArea>

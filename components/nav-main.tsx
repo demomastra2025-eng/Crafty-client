@@ -25,8 +25,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { sidebarData } from "@/@data/sidebar";
 import { Fragment } from "react";
+import type { SidebarNavMainItem } from "@/@data/sidebar";
 
-export type NavMainProps = typeof sidebarData.navMain;
+type NavItem = SidebarNavMainItem & { items?: SidebarNavMainItem[] };
+type NavSection = { title: string; items: NavItem[] };
+export type NavMainProps = NavSection[];
 
 export function NavMain({ items }: { items: NavMainProps }) {
   const isMobile = useIsMobile();

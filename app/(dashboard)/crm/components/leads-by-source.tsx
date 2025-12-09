@@ -13,26 +13,26 @@ import { CardOptionsMenu } from "@/components/CardActionMenus";
 
 const chartData = [
   { source: "social", leads: 275, fill: "var(--color-social-network)" },
-  { source: "email", leads: 200, fill: "var(--color-email)" },
-  { source: "call", leads: 287, fill: "var(--color-call)" },
-  { source: "others", leads: 173, fill: "var(--color-others)" }
+  { source: "email", leads: 220, fill: "var(--color-email)" },
+  { source: "call", leads: 310, fill: "var(--color-call)" },
+  { source: "partners", leads: 190, fill: "var(--color-others)" }
 ];
 
 const chartConfig = {
   social: {
-    label: "Social",
+    label: "Соцсети",
     color: "var(--chart-1)"
   },
   email: {
-    label: "Email",
+    label: "Email-рассылки",
     color: "var(--chart-2)"
   },
   call: {
-    label: "Call",
+    label: "Холодные звонки",
     color: "var(--chart-3)"
   },
-  others: {
-    label: "Others",
+  partners: {
+    label: "Партнёры",
     color: "var(--chart-4)"
   }
 } satisfies ChartConfig;
@@ -47,7 +47,7 @@ export function LeadBySourceCard() {
   return (
     <Card className="flex flex-col">
       <CardHeader className="flex flex-row justify-between">
-        <CardTitle>Leads by Source</CardTitle>
+        <CardTitle>Лиды по источникам</CardTitle>
         <CardOptionsMenu />
       </CardHeader>
       <CardContent className="flex-1">
@@ -74,7 +74,7 @@ export function LeadBySourceCard() {
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground">
-                          Leads
+                          Лиды
                         </tspan>
                       </text>
                     );

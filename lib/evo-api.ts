@@ -1,0 +1,631 @@
+const API_URL = process.env.NEXT_PUBLIC_EVOLUTION_API_URL || process.env.EVOLUTION_API_URL;
+const API_KEY = process.env.NEXT_PUBLIC_EVOLUTION_API_KEY || process.env.EVOLUTION_API_KEY;
+const OWNER_NUMBER =
+  process.env.NEXT_PUBLIC_EVOLUTION_OWNER_NUMBER || process.env.EVOLUTION_OWNER_NUMBER;
+const FALLBACK_INSTANCE =
+  process.env.NEXT_PUBLIC_EVOLUTION_INSTANCE || process.env.EVOLUTION_INSTANCE;
+
+const PREFERRED_INSTANCE_KEY = "crafty:selected-evo-instance";
+
+export type PreferredInstance = {
+  id?: string | null;
+  name?: string | null;
+};
+
+if (!API_URL || !API_KEY) {
+  console.warn("Evolution API env vars not fully set (EVOLUTION_API_URL/KEY).");
+}
+
+const isServer = typeof window === "undefined";
+const API_BASE = API_URL ? API_URL.replace(/\/$/, "") : "";
+const PROXY_BASE = "/api/evo";
+
+const ensureServerEnv = () => {
+  if (isServer && (!API_URL || !API_KEY)) {
+    throw new Error("Evolution API env vars are missing.");
+  }
+};
+
+const evoHeaders = (headers: HeadersInit = {}) =>
+  isServer ? { ...headers, apikey: API_KEY! } : headers;
+
+const evoBaseUrl = () => (isServer ? API_BASE : PROXY_BASE);
+
+export type EvoInstance = {
+  instanceName: string;
+  number?: string;
+  connectionStatus?: string;
+  name?: string;
+  id?: string;
+  ownerJid?: string;
+  profilePicUrl?: string | null;
+  token?: string;
+  updatedAt?: string;
+  instanceId?: string;
+  integration?: string;
+};
+
+const buildQuery = (params: Record<string, string | undefined>) => {
+  const search = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value) search.append(key, value);
+  });
+  const qs = search.toString();
+  return qs ? `?${qs}` : "";
+};
+
+const getPreferredInstance = (): PreferredInstance | null => {
+  if (isServer) return null;
+  try {
+    const raw = localStorage.getItem(PREFERRED_INSTANCE_KEY);
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw) as PreferredInstance;
+      if (parsed && (parsed.id || parsed.name)) return parsed;
+    } catch {
+      // legacy string value with name only
+      return { name: raw };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+};
+
+export const setPreferredInstance = (payload: PreferredInstance | null) => {
+  if (isServer) return;
+  try {
+    if (payload?.id || payload?.name) {
+      localStorage.setItem(
+        PREFERRED_INSTANCE_KEY,
+        JSON.stringify({ id: payload.id || null, name: payload.name || null })
+      );
+    } else {
+      localStorage.removeItem(PREFERRED_INSTANCE_KEY);
+    }
+  } catch {
+    // ignore storage errors
+  }
+};
+
+export const readPreferredInstance = getPreferredInstance;
+
+export async function fetchInstances() {
+  ensureServerEnv();
+  const res = await fetch(`${evoBaseUrl()}/instance/fetchInstances`, {
+    headers: evoHeaders()
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`fetchInstances error ${res.status}: ${body}`);
+  }
+  const data = await res.json();
+  const list: EvoInstance[] = Array.isArray(data)
+    ? (data as EvoInstance[])
+    : Array.isArray((data as { instances?: EvoInstance[] })?.instances)
+      ? ((data as { instances?: EvoInstance[] }).instances as EvoInstance[])
+      : [];
+  return list
+    .map((item: EvoInstance) => ({
+      ...item,
+      instanceName: item.instanceName || item.name || item.id
+    }))
+    .filter((item: EvoInstance) => Boolean(item.instanceName));
+}
+
+export async function resolveInstance(): Promise<string | null> {
+  const preferred = getPreferredInstance()?.name || null;
+  try {
+    const list = await fetchInstances();
+    const preferredAvailable =
+      preferred && list.some((i) => i.instanceName === preferred) ? preferred : null;
+    const byNumber =
+      OWNER_NUMBER && list.find((i) => (i.number || "").includes(String(OWNER_NUMBER)));
+    const connected = list.find((i) => i.connectionStatus === "open");
+    return (
+      preferredAvailable ||
+      byNumber?.instanceName ||
+      connected?.instanceName ||
+      list[0]?.instanceName ||
+      FALLBACK_INSTANCE ||
+      preferred ||
+      null
+    );
+  } catch (e) {
+    if (preferred) return preferred;
+    if (FALLBACK_INSTANCE) return FALLBACK_INSTANCE;
+    throw e;
+  }
+}
+
+export type SendTextPayload = {
+  number: string;
+  text: string;
+};
+
+export async function sendTextMessage(instance: string, payload: SendTextPayload) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+
+  const url = `${evoBaseUrl()}/message/sendText/${instance}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: evoHeaders({
+      "Content-Type": "application/json"
+    }),
+    body: JSON.stringify(payload)
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`SendText error ${res.status}: ${body}`);
+  }
+
+  return res.json();
+}
+
+export async function sendMedia(instance: string, payload: Record<string, unknown>) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const url = `${evoBaseUrl()}/message/sendMedia/${instance}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: evoHeaders({
+      "Content-Type": "application/json"
+    }),
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`sendMedia error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export async function sendLocation(instance: string, payload: Record<string, unknown>) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const url = `${evoBaseUrl()}/message/sendLocation/${instance}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: evoHeaders({
+      "Content-Type": "application/json"
+    }),
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`sendLocation error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export async function sendContact(instance: string, payload: Record<string, unknown>) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const url = `${evoBaseUrl()}/message/sendContact/${instance}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: evoHeaders({
+      "Content-Type": "application/json"
+    }),
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`sendContact error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export async function sendReaction(instance: string, payload: Record<string, unknown>) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const url = `${evoBaseUrl()}/message/sendReaction/${instance}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: evoHeaders({
+      "Content-Type": "application/json"
+    }),
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`sendReaction error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export async function sendButtons(instance: string, payload: Record<string, unknown>) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const url = `${evoBaseUrl()}/message/sendButtons/${instance}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: evoHeaders({
+      "Content-Type": "application/json"
+    }),
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`sendButtons error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export async function sendList(instance: string, payload: Record<string, unknown>) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const url = `${evoBaseUrl()}/message/sendList/${instance}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: evoHeaders({
+      "Content-Type": "application/json"
+    }),
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`sendList error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export async function sendPoll(instance: string, payload: Record<string, unknown>) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const url = `${evoBaseUrl()}/message/sendPoll/${instance}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: evoHeaders({
+      "Content-Type": "application/json"
+    }),
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`sendPoll error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export async function sendMediaFile(instance: string, payload: { number: string; file: File; caption?: string }) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const url = `${evoBaseUrl()}/message/sendMedia/${instance}`;
+  const form = new FormData();
+  form.append("number", payload.number);
+  if (payload.caption) form.append("caption", payload.caption);
+  form.append("file", payload.file);
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: evoHeaders(),
+    body: form
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`sendMediaFile error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+export type HandleLabelPayload = {
+  number: string;
+  labelId: string;
+  action: "add" | "remove";
+};
+
+export async function handleLabel(instance: string, payload: HandleLabelPayload) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const url = `${evoBaseUrl()}/label/handleLabel/${instance}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: evoHeaders({
+      "Content-Type": "application/json"
+    }),
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`handleLabel error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export type MarkChatReadPayload = {
+  remoteJid?: string;
+  messageId?: string;
+  readMessages?: Array<{ remoteJid: string; fromMe: boolean; id: string }>;
+};
+
+export async function markChatAsRead(instance: string, payload: MarkChatReadPayload) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const url = `${evoBaseUrl()}/chat/markMessageAsRead/${instance}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: evoHeaders({
+      "Content-Type": "application/json"
+    }),
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`markChatAsRead error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export type UpdateMessagePayload = {
+  number: string;
+  key: { remoteJid: string; fromMe: boolean; id: string };
+  text: string;
+};
+
+export async function updateMessage(instance: string, payload: UpdateMessagePayload) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const url = `${evoBaseUrl()}/chat/updateMessage/${instance}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: evoHeaders({
+      "Content-Type": "application/json"
+    }),
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`updateMessage error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export type FetchMediaBase64Payload = {
+  remoteJid?: string;
+  messageId?: string;
+  keyId?: string;
+  participant?: string;
+  fromMe?: boolean;
+  message?: { key?: { id?: string } };
+  convertToMp4?: boolean;
+};
+
+export async function fetchMediaBase64(instance: string, payload: FetchMediaBase64Payload) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const url = `${evoBaseUrl()}/chat/getBase64FromMediaMessage/${instance}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: evoHeaders({
+      "Content-Type": "application/json"
+    }),
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`fetchMediaBase64 error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export async function findContacts(instance: string, payload: Record<string, unknown> = {}) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const url = `${evoBaseUrl()}/chat/findContacts/${instance}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: evoHeaders({
+      "Content-Type": "application/json"
+    }),
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`findContacts error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export async function connectInstance(
+  instance: string,
+  options?: { number?: string; instanceId?: string }
+) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const query = buildQuery({
+    number: options?.number || OWNER_NUMBER,
+    instanceId: options?.instanceId || undefined
+  });
+  const res = await fetch(
+    `${evoBaseUrl()}/instance/connect/${instance}${query}`,
+    {
+      headers: evoHeaders()
+    }
+  );
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`connectInstance error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export async function restartInstance(instance: string) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const res = await fetch(`${evoBaseUrl()}/instance/restart/${instance}`, {
+    method: "POST",
+    headers: evoHeaders()
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`restartInstance error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export async function fetchConnectionState(instance: string) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const res = await fetch(`${evoBaseUrl()}/instance/connectionState/${instance}`, {
+    headers: evoHeaders()
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`connectionState error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export async function createInstance(payload: {
+  instanceName: string;
+  integration?: string;
+  qrcode?: boolean;
+  number?: string;
+}) {
+  ensureServerEnv();
+  const res = await fetch(`${evoBaseUrl()}/instance/create`, {
+    method: "POST",
+    headers: evoHeaders({
+      "Content-Type": "application/json"
+    }),
+    body: JSON.stringify({
+      integration: "WHATSAPP-BAILEYS",
+      qrcode: true,
+      ...payload
+    })
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`createInstance error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export async function logoutInstance(instance: string) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const res = await fetch(`${evoBaseUrl()}/instance/logout/${instance}`, {
+    method: "DELETE",
+    headers: evoHeaders()
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`logoutInstance error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export async function updateBlockStatus(instance: string, remoteJid: string, block: boolean) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const url = `${evoBaseUrl()}/message/updateBlockStatus/${instance}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: evoHeaders({
+      "Content-Type": "application/json"
+    }),
+    body: JSON.stringify({ remoteJid, block })
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`updateBlockStatus error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export async function deleteInstance(instance: string, options?: { instanceId?: string }) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const query = buildQuery({ instanceId: options?.instanceId || undefined });
+  const res = await fetch(
+    `${evoBaseUrl()}/instance/delete/${instance}${query}`,
+    {
+      method: "DELETE",
+      headers: evoHeaders()
+    }
+  );
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`deleteInstance error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export async function setPresence(instance: string, presence: "available" | "unavailable" | "composing") {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const res = await fetch(`${evoBaseUrl()}/instance/setPresence/${instance}`, {
+    method: "POST",
+    headers: evoHeaders({
+      "Content-Type": "application/json"
+    }),
+    body: JSON.stringify({ presence })
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`setPresence error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export async function findSettings(instance: string) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const res = await fetch(`${evoBaseUrl()}/settings/find/${instance}`, {
+    headers: evoHeaders()
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`findSettings error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export async function setSettings(instance: string, payload: Record<string, unknown>) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const res = await fetch(`${evoBaseUrl()}/settings/set/${instance}`, {
+    method: "POST",
+    headers: evoHeaders({
+      "Content-Type": "application/json"
+    }),
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`setSettings error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export async function findProxy(instance: string) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const res = await fetch(`${evoBaseUrl()}/proxy/find/${instance}`, {
+    headers: evoHeaders()
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`findProxy error ${res.status}: ${body}`);
+  }
+  return res.json();
+}
+
+export async function setProxy(instance: string, payload: Record<string, unknown>) {
+  ensureServerEnv();
+  if (!instance) throw new Error("Evolution API env vars are missing.");
+  const res = await fetch(`${evoBaseUrl()}/proxy/set/${instance}`, {
+    method: "POST",
+    headers: evoHeaders({
+      "Content-Type": "application/json"
+    }),
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`setProxy error ${res.status}: ${body}`);
+  }
+  return res.json();
+}

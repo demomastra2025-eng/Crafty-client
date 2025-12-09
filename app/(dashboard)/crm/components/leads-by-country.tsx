@@ -15,62 +15,62 @@ import {
 import { CardOptionsMenu } from "@/components/CardActionMenus";
 
 const data = [
-  { country: "cn", value: 208679114, color: "red" },
-  { country: "us", value: 161062905 },
-  { country: "ru", value: 141944641 },
-  { country: "id", value: 127318112 },
-  { country: "in", value: 1311559204 }
+  { country: "KZ", value: 1250 },
+  { country: "RU", value: 840 },
+  { country: "UZ", value: 560 },
+  { country: "KG", value: 320 },
+  { country: "TR", value: 410 }
 ];
 
 const countries = [
   {
     id: 1,
-    country: "China",
-    lead_count: "430",
-    bounce_rate: "5.9%"
+    country: "Казахстан",
+    lead_count: "1 250",
+    bounce_rate: "5.1%"
   },
   {
     id: 2,
-    country: "ABD",
-    lead_count: "435",
-    bounce_rate: "3%"
+    country: "Россия",
+    lead_count: "840",
+    bounce_rate: "4.0%"
   },
   {
     id: 3,
-    country: "Russia",
-    lead_count: "982",
+    country: "Узбекистан",
+    lead_count: "560",
     bounce_rate: "4.8%"
   },
   {
     id: 4,
-    country: "Indonesia",
-    lead_count: "542",
-    bounce_rate: "2.3%"
+    country: "Кыргызстан",
+    lead_count: "320",
+    bounce_rate: "3.1%"
   },
   {
     id: 5,
-    country: "India",
-    lead_count: "742",
-    bounce_rate: "5%"
+    country: "Турция",
+    lead_count: "410",
+    bounce_rate: "5.4%"
   }
 ];
 
 const getStyle = ({ countryCode }: CountryContext) => {
   let fillColor = "var(--muted)";
   switch (countryCode) {
-    case "RU":
+    case "KZ":
       fillColor = "var(--chart-1)";
       break;
-    case "US":
+    case "RU":
       fillColor = "var(--chart-2)";
       break;
-    case "CN":
+    case "UZ":
       fillColor = "var(--chart-3)";
       break;
-    case "ID":
+    case "KG":
       fillColor = "var(--chart-4)";
       break;
-    case "IN":
+    case "TR":
       fillColor = "var(--chart-5)";
       break;
 
@@ -96,7 +96,7 @@ export function LeadsByCountryCard() {
   return (
     <Card className="flex flex-col">
       <CardHeader className="flex flex-row justify-between">
-        <CardTitle>Lead by Countries</CardTitle>
+        <CardTitle>Лиды по регионам</CardTitle>
         <CardOptionsMenu />
       </CardHeader>
       <CardContent className="flex-1 pb-0">
@@ -105,7 +105,7 @@ export function LeadsByCountryCard() {
             {isClient ? (
               <WorldMap
                 backgroundColor="hsl(var(--background))"
-                value-suffix="people"
+                value-suffix="лидов"
                 data={data}
                 size="md"
                 styleFunction={getStyle}
@@ -115,9 +115,9 @@ export function LeadsByCountryCard() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Country</TableHead>
-                <TableHead>User</TableHead>
-                <TableHead className="text-right">Bounce Rate</TableHead>
+                <TableHead>Страна</TableHead>
+                <TableHead>Лиды</TableHead>
+                <TableHead className="text-right">Отказ</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

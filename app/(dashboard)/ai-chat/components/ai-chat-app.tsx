@@ -11,68 +11,72 @@ export default function AIChatApp() {
   const [chats] = useState([
     {
       id: "1",
-      title: "Can you fly?",
-      preview: "Not on my own! I exist o...",
-      timestamp: new Date(Date.now() - 1000 * 60 * 30) // 30 minutes ago
+      title: "Как оформить ИП в Казахстане?",
+      preview: "Пошагово: ЭЦП, eGov, налоги...",
+      timestamp: new Date(Date.now() - 1000 * 60 * 30), // 30 минут назад
+      isFavorite: true
     },
     {
       id: "2",
-      title: "Do you have emotion...",
-      preview: "I can't feel emotions my...",
-      timestamp: new Date(Date.now() - 1000 * 60 * 60) // 1 hour ago
+      title: "Подготовь КП для Astana Hub",
+      preview: "Укажи тарифы, сроки, команду...",
+      timestamp: new Date(Date.now() - 1000 * 60 * 60), // 1 час назад
+      isFavorite: true
     },
     {
       id: "3",
-      title: "Will robots take over t...",
-      preview: "Science fiction is fun, b...",
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2) // 2 hours ago
+      title: "Скрипт звонка для Алматы",
+      preview: "Приветствие, потребность, оффер...",
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2) // 2 часа назад
     },
     {
       id: "4",
-      title: "What's the meaning o...",
-      preview: "That's a big question ph...",
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3) // 3 hours ago
+      title: "Презентация ЖК в Астане",
+      preview: "Сделать слайды на русском/казахском",
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3), // 3 часа назад
+      isArchived: true
     },
     {
       id: "5",
-      title: "Can you write a song ...",
-      preview: "I can definitely help you...",
+      title: "Пост в Telegram про ЖК",
+      preview: "Два абзаца, добавить смайлы...",
       timestamp: new Date(Date.now() - 1000 * 60 * 60 * 4) // 4 hours ago
     },
     {
       id: "6",
-      title: "What's the best way t...",
-      preview: "Unfortunately, there's n...",
+      title: "Сравни налоги ИП/ТОO",
+      preview: "Порог 24 млн, ОСМС, соцналог...",
       timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5) // 5 hours ago
     },
     {
       id: "7",
-      title: "What's your favorite c...",
-      preview: "As a language model, I ...",
+      title: "Адаптируй письмо для банка",
+      preview: "Запрос по проектному финансированию...",
       timestamp: new Date(Date.now() - 1000 * 60 * 60 * 6) // 6 hours ago
     },
     {
       id: "8",
-      title: "Can you predict the f...",
-      preview: "I can't see the future, b...",
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 7) // 7 hours ago
+      title: "FAQ по клиентам из Узбекистана",
+      preview: "Доставка, валютный контроль...",
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 7) // 7 часов назад
     },
     {
       id: "9",
-      title: "What's the best pizza ...",
-      preview: "That's entirely up to you...",
+      title: "Сообщение для инвестора",
+      preview: "Коротко о цифрах и команде...",
       timestamp: new Date(Date.now() - 1000 * 60 * 60 * 8) // 8 hours ago
     },
     {
       id: "10",
-      title: "Are you sentient?",
-      preview: "Sentience is a complex ...",
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 9) // 9 hours ago
+      title: "Контент-план по новостройкам",
+      preview: "Сетку постов на месяц...",
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 9), // 9 часов назад
+      isFavorite: true
     },
     {
       id: "11",
-      title: "Can you solve this m...",
-      preview: "Just type ou...",
+      title: "Шаблон договора аренды",
+      preview: "Нужно учесть депозит и ремонт...",
       timestamp: new Date(Date.now() - 1000 * 60 * 60 * 10) // 10 hours ago
     }
   ]);
@@ -85,13 +89,13 @@ export default function AIChatApp() {
             {
               id: "1",
               role: "user",
-              content: "Do you have emotions?"
+              content: "Подготовь письмо клиенту на русском и казахском"
             },
             {
               id: "2",
               role: "assistant",
               content:
-                "I can't feel emotions myself, but I can understand and respond to yours! Tell me how you're feeling today."
+                "Конечно! Напиши, что это за клиент и что нужно подчеркнуть: сроки, цену, локацию или команду?"
             }
           ]
         : []
@@ -112,14 +116,14 @@ export default function AIChatApp() {
   };
 
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex h-[calc(113vh-10rem)] min-h-0 w-full overflow-hidden rounded-xl bg-white">
       <Sidebar
         chats={chats}
         selectedChatId={selectedChatId}
         onNewChat={handleNewChat}
         onSelectChat={handleSelectChat}
       />
-      <div className="flex flex-1 flex-col">
+      <div className="flex min-h-0 flex-1 flex-col">
         {!selectedChatId ? (
           <WelcomeScreen onSuggestionClick={handleSuggestionClick} />
         ) : (

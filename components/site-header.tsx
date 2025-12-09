@@ -3,8 +3,6 @@
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
-import MessagesPanel from "@/components/layout/dashboard/header/messages";
-import NotificationsPanel from "@/components/layout/dashboard/header/notifications";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -38,8 +36,6 @@ export function SiteHeader() {
         </Breadcrumb>
 
         <div className="ml-auto flex items-center gap-2">
-          <MessagesPanel />
-          <NotificationsPanel />
         </div>
       </div>
     </header>

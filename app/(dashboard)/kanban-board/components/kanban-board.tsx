@@ -36,23 +36,23 @@ export default function KanbanBoard() {
     backlog: [
       {
         id: "1",
-        title: "Integrate Stripe payment gateway",
-        description: "Set up and configure Stripe API for handling credit card transactions.",
+        title: "Настроить оплату через Kaspi/KKM",
+        description: "Подключить приём оплат для ЖК в Астане, протестировать чеки и возвраты.",
         priority: "high",
-        assignee: "Emma Johnson",
-        dueDate: "2024-09-20",
+        assignee: "Айгерим Нурлан",
+        dueDate: "25.06.2024",
         users: [
           {
-            name: "Emma",
-            src: "https://bundui-images.netlify.app/avatars/01.png",
-            alt: "Emma Avatar",
-            fallback: "EJ"
+            name: "Айгерим",
+            src: "/logo.png",
+            alt: "Айгерим",
+            fallback: "AN"
           },
           {
-            name: "Daniel",
-            src: "https://bundui-images.netlify.app/avatars/02.png",
-            alt: "Daniel Avatar",
-            fallback: "DS"
+            name: "Данияр",
+            src: "/logo.png",
+            alt: "Данияр",
+            fallback: "DK"
           }
         ],
         progress: 10,
@@ -61,23 +61,23 @@ export default function KanbanBoard() {
       },
       {
         id: "2",
-        title: "Redesign marketing homepage",
-        description: "Update the homepage with the new brand colors, typography, and hero section.",
+        title: "Лендинг ЖК на каз/рус",
+        description: "Двухязычный лендинг с формой заявки и блоком о застройщике.",
         priority: "medium",
-        assignee: "Lucas Brown",
-        dueDate: "2024-09-25",
+        assignee: "Мадина Ержан",
+        dueDate: "27.06.2024",
         users: [
           {
-            name: "Lucas",
-            src: "https://bundui-images.netlify.app/avatars/03.png",
-            alt: "Lucas Avatar",
-            fallback: "LB"
+            name: "Мадина",
+            src: "/logo.png",
+            alt: "Мадина",
+            fallback: "ME"
           },
           {
-            name: "Sophia",
-            src: "https://bundui-images.netlify.app/avatars/04.png",
-            alt: "Sophia Avatar",
-            fallback: "SR"
+            name: "Айсұлу",
+            src: "/logo.png",
+            alt: "Айсұлу",
+            fallback: "AS"
           }
         ],
         progress: 0,
@@ -86,23 +86,23 @@ export default function KanbanBoard() {
       },
       {
         id: "3",
-        title: "Set up automated backups",
-        description: "Implement daily database backups with secure cloud storage.",
+        title: "Авто-бэкапы CRM",
+        description: "Дневные бэкапы в облако (AlmaCloud), проверка восстановления.",
         priority: "low",
-        assignee: "Mia Williams",
-        dueDate: "2024-09-28",
+        assignee: "Санжар Али",
+        dueDate: "30.06.2024",
         users: [
           {
-            name: "Mia",
-            src: "https://bundui-images.netlify.app/avatars/05.png",
-            alt: "Mia Avatar",
-            fallback: "MW"
+            name: "Санжар",
+            src: "/logo.png",
+            alt: "Санжар",
+            fallback: "SA"
           },
           {
-            name: "Jack",
-            src: "https://bundui-images.netlify.app/avatars/06.png",
-            alt: "Jack Avatar",
-            fallback: "JL"
+            name: "Айдана",
+            src: "/logo.png",
+            alt: "Айдана",
+            fallback: "AK"
           }
         ],
         progress: 5,
@@ -111,23 +111,23 @@ export default function KanbanBoard() {
       },
       {
         id: "4",
-        title: "Implement blog search functionality",
-        description: "Add a search bar to filter blog posts by title and tags.",
+        title: "Согласовать договор с застройщиком",
+        description: "Уточнить условия по отсрочке, гарантиям и маркетинговому бюджету.",
         priority: "medium",
-        assignee: "Olivia Davis",
-        dueDate: "2024-09-29",
+        assignee: "Әсел Каримова",
+        dueDate: "24.06.2024",
         users: [
           {
-            name: "Olivia",
-            src: "https://bundui-images.netlify.app/avatars/07.png",
-            alt: "Olivia Avatar",
-            fallback: "OD"
+            name: "Әсел",
+            src: "/logo.png",
+            alt: "Әсел",
+            fallback: "AK"
           },
           {
-            name: "Henry",
-            src: "https://bundui-images.netlify.app/avatars/08.png",
-            alt: "Henry Avatar",
-            fallback: "HT"
+            name: "Ернар",
+            src: "/logo.png",
+            alt: "Ернар",
+            fallback: "ET"
           }
         ],
         progress: 0,
@@ -138,23 +138,23 @@ export default function KanbanBoard() {
     inProgress: [
       {
         id: "5",
-        title: "Dark mode toggle implementation",
-        description: "Allow users to switch between light and dark themes in settings.",
+        title: "Запуск рекламы в Алматы",
+        description: "Настроить таргет на Telegram и Instagram, проверить конверсии в CRM.",
         priority: "high",
-        assignee: "Charlie Wilson",
-        dueDate: "2024-09-18",
+        assignee: "Данияр К.",
+        dueDate: "22.06.2024",
         users: [
           {
-            name: "Charlie",
-            src: "https://bundui-images.netlify.app/avatars/09.png",
-            alt: "Charlie Avatar",
-            fallback: "CW"
+            name: "Данияр",
+            src: "/logo.png",
+            alt: "Данияр",
+            fallback: "DK"
           },
           {
-            name: "Ava",
-            src: "https://bundui-images.netlify.app/avatars/10.png",
-            alt: "Ava Avatar",
-            fallback: "AR"
+            name: "Айя",
+            src: "/logo.png",
+            alt: "Айя",
+            fallback: "AA"
           }
         ],
         progress: 40,
@@ -163,23 +163,23 @@ export default function KanbanBoard() {
       },
       {
         id: "6",
-        title: "Database schema refactoring",
-        description: "Normalize tables and improve query performance for large datasets.",
+        title: "Миграция сделок в новую CRM",
+        description: "Перенести воронку, статусы и права. Проверить вебхуки на оплату.",
         priority: "medium",
-        assignee: "Liam Martinez",
-        dueDate: "2024-09-19",
+        assignee: "Самат Ж.",
+        dueDate: "23.06.2024",
         users: [
           {
-            name: "Liam",
-            src: "https://bundui-images.netlify.app/avatars/11.png",
-            alt: "Liam Avatar",
-            fallback: "LM"
+            name: "Самат",
+            src: "/logo.png",
+            alt: "Самат",
+            fallback: "SJ"
           },
           {
-            name: "Isabella",
-            src: "https://bundui-images.netlify.app/avatars/12.png",
-            alt: "Isabella Avatar",
-            fallback: "IN"
+            name: "Жансая",
+            src: "/logo.png",
+            alt: "Жансая",
+            fallback: "JA"
           }
         ],
         progress: 55,
@@ -188,23 +188,23 @@ export default function KanbanBoard() {
       },
       {
         id: "7",
-        title: "Accessibility improvements",
-        description: "Ensure the platform meets WCAG 2.1 AA accessibility standards.",
+        title: "Юзабилити-тест для отдела продаж",
+        description: "Проверить сценарий быстрой записи лида и выставления счета.",
         priority: "low",
-        assignee: "Noah Taylor",
-        dueDate: "2024-09-22",
+        assignee: "Айым Талгат",
+        dueDate: "21.06.2024",
         users: [
           {
-            name: "Noah",
-            src: "https://bundui-images.netlify.app/avatars/13.png",
-            alt: "Noah Avatar",
-            fallback: "NT"
+            name: "Айым",
+            src: "/logo.png",
+            alt: "Айым",
+            fallback: "AT"
           },
           {
-            name: "Ella",
-            src: "https://bundui-images.netlify.app/avatars/14.png",
-            alt: "Ella Avatar",
-            fallback: "EL"
+            name: "Амина",
+            src: "/logo.png",
+            alt: "Амина",
+            fallback: "AR"
           }
         ],
         progress: 35,
@@ -215,23 +215,23 @@ export default function KanbanBoard() {
     done: [
       {
         id: "8",
-        title: "Set up CI/CD pipeline",
-        description: "Automate deployment process using GitHub Actions and Vercel.",
+        title: "CI/CD на Vercel",
+        description: "Собираем ветку main, автодеплой демо-окружения.",
         priority: "high",
-        assignee: "Ethan Clark",
-        dueDate: "2024-09-12",
+        assignee: "Ержан М.",
+        dueDate: "15.06.2024",
         users: [
           {
-            name: "Ethan",
-            src: "https://bundui-images.netlify.app/avatars/15.png",
-            alt: "Ethan Avatar",
-            fallback: "EC"
+            name: "Ержан",
+            src: "/logo.png",
+            alt: "Ержан",
+            fallback: "EM"
           },
           {
-            name: "Grace",
-            src: "https://bundui-images.netlify.app/avatars/16.png",
-            alt: "Grace Avatar",
-            fallback: "GR"
+            name: "Гульнар",
+            src: "/logo.png",
+            alt: "Гульнар",
+            fallback: "GA"
           }
         ],
         progress: 100,
@@ -240,24 +240,23 @@ export default function KanbanBoard() {
       },
       {
         id: "9",
-        title: "Initial project setup",
-        description:
-          "Create project structure, install dependencies, and configure ESLint/Prettier.",
+        title: "Базовая настройка проекта",
+        description: "Создан репозиторий, ESLint/Prettier, алиасы и Husky.",
         priority: "medium",
-        assignee: "Harper Lewis",
-        dueDate: "2024-09-10",
+        assignee: "Дана С.",
+        dueDate: "12.06.2024",
         users: [
           {
-            name: "Harper",
-            src: "https://bundui-images.netlify.app/avatars/17.png",
-            alt: "Harper Avatar",
-            fallback: "HL"
+            name: "Дана",
+            src: "/logo.png",
+            alt: "Дана",
+            fallback: "DS"
           },
           {
-            name: "Benjamin",
-            src: "https://bundui-images.netlify.app/avatars/18.png",
-            alt: "Benjamin Avatar",
-            fallback: "BM"
+            name: "Бекзат",
+            src: "/logo.png",
+            alt: "Бекзат",
+            fallback: "BB"
           }
         ],
         progress: 100,
@@ -268,9 +267,9 @@ export default function KanbanBoard() {
   });
 
   const [columnTitles, setColumnTitles] = React.useState<Record<string, string>>({
-    backlog: "Backlog",
-    inProgress: "In Progress",
-    done: "Done"
+    backlog: "Бэклог",
+    inProgress: "В работе",
+    done: "Готово"
   });
 
   function addColumn() {
@@ -288,7 +287,7 @@ export default function KanbanBoard() {
   return (
     <div className="h-full p-6">
       <div className="mb-4">
-        <Button onClick={addColumn}>+ Add Column</Button>
+        <Button onClick={addColumn}>+ Добавить колонку</Button>
       </div>
       <Kanban.Root value={columns} onValueChange={setColumns} getItemValue={(item) => item.id}>
         <Kanban.Board className="flex w-full gap-4 overflow-x-auto pb-4">
@@ -312,7 +311,7 @@ export default function KanbanBoard() {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Add Task</p>
+                      <p>Добавить задачу</p>
                     </TooltipContent>
                   </Tooltip>
                 </div>
@@ -323,9 +322,7 @@ export default function KanbanBoard() {
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-base font-semibold">{task.title}</CardTitle>
-                        <CardDescription>
-                          Compile competitor landing page designs for inspiration. G..
-                        </CardDescription>
+                        <CardDescription>{task.description}</CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div className="text-muted-foreground flex items-center justify-between text-sm">
@@ -345,7 +342,7 @@ export default function KanbanBoard() {
                                   r="16"
                                   fill="none"
                                   className="stroke-current text-gray-200 dark:text-neutral-700"
-                                  stroke-width="2"></circle>
+                                  strokeWidth="2"></circle>
                                 <circle
                                   cx="18"
                                   cy="18"
@@ -355,12 +352,12 @@ export default function KanbanBoard() {
                                     "text-green-600!": task.progress === 100,
                                     "text-orange-500!": task.progress > 50 && task.progress < 100
                                   })}
-                                  stroke-width="2"
+                                  strokeWidth="2"
                                   strokeDasharray={2 * Math.PI * 16}
                                   strokeDashoffset={
                                     2 * Math.PI * 16 - (2 * Math.PI * 16 * task.progress) / 100
                                   }
-                                  stroke-linecap="round"></circle>
+                                  strokeLinecap="round"></circle>
                               </svg>
                             </div>
                             {`${task.progress}%`}
@@ -373,7 +370,7 @@ export default function KanbanBoard() {
                               <Avatar key={index} className="border-2 border-white">
                                 <AvatarImage
                                   src={
-                                    user.src || "https://bundui-images.netlify.app/avatars/08.png"
+                                    user.src || "/logo.png"
                                   }
                                   alt={user.alt}
                                 />

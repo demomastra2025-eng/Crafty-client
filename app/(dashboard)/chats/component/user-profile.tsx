@@ -1,6 +1,7 @@
 import { Download } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
 interface User {
@@ -12,6 +13,11 @@ interface User {
   email: string;
   phone: string;
   location: string;
+  labels?: Array<{
+    labelId: string;
+    name: string;
+    color?: string | null;
+  }>;
   sharedFiles: Array<{
     name: string;
     type: string;
@@ -23,6 +29,21 @@ interface UserProfileProps {
   onClose: () => void;
 }
 
+const labelColorClass = (color?: string | null) => {
+  switch ((color || "").trim()) {
+    case "1":
+      return "bg-blue-100 text-blue-800";
+    case "2":
+      return "bg-green-100 text-green-800";
+    case "3":
+      return "bg-yellow-100 text-yellow-800";
+    case "4":
+      return "bg-red-100 text-red-800";
+    default:
+      return "bg-gray-100 text-gray-800";
+  }
+};
+
 export function UserProfile({ user }: UserProfileProps) {
   return (
     <div className="flex w-80 flex-col border-l border-gray-200 bg-white">
@@ -31,7 +52,7 @@ export function UserProfile({ user }: UserProfileProps) {
         <div className="relative inline-block">
           <Avatar className="mx-auto h-20 w-20">
             <AvatarImage
-              src={user.avatar || "https://bundui-images.netlify.app/avatars/08.png"}
+              src={user.avatar || "/logo.png"}
               alt={user.name}
             />
             <AvatarFallback className="text-lg">
@@ -48,37 +69,35 @@ export function UserProfile({ user }: UserProfileProps) {
       </div>
 
       <div className="flex-1 overflow-y-auto px-6">
-        {/* Bio Section */}
-        <div className="mb-6">
-          <h3 className="mb-2 text-sm font-medium text-gray-900">Bio</h3>
-          <p className="text-sm leading-relaxed text-gray-600">{user.bio}</p>
-        </div>
-
-        <Separator className="my-6" />
-
         {/* Contact Information */}
         <div className="space-y-4">
           <div>
-            <h3 className="mb-1 text-sm font-medium text-gray-900">Email</h3>
-            <p className="text-sm text-gray-600">{user.email}</p>
-          </div>
-
-          <div>
-            <h3 className="mb-1 text-sm font-medium text-gray-900">Phone</h3>
+            <h3 className="mb-1 text-sm font-medium text-gray-900">Телефон</h3>
             <p className="text-sm text-gray-600">{user.phone}</p>
           </div>
 
-          <div>
-            <h3 className="mb-1 text-sm font-medium text-gray-900">Location</h3>
-            <p className="text-sm text-gray-600">{user.location}</p>
-          </div>
+          {user.labels?.length ? (
+            <div>
+              <h3 className="mb-1 text-sm font-medium text-gray-900">Теги</h3>
+              <div className="flex flex-wrap gap-1">
+                {user.labels.map((label) => (
+                  <Badge
+                    key={label.labelId}
+                    variant="secondary"
+                    className={`text-[10px] ${labelColorClass(label.color)}`}>
+                    {label.name || label.labelId}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </div>
 
         <Separator className="my-6" />
 
         {/* Shared Files */}
         <div>
-          <h3 className="mb-4 text-sm font-medium text-gray-900">Shared Files</h3>
+          <h3 className="mb-4 text-sm font-medium text-gray-900">Файлы</h3>
           <div className="space-y-3">
             {user.sharedFiles.map((file, index) => (
               <div

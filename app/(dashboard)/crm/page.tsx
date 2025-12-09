@@ -13,9 +13,8 @@ import StatCards from "./components/stat-cards";
 
 export async function generateMetadata(): Promise<Metadata> {
   return generateMeta({
-    title: "CRM Admin Template",
-    description:
-      "CRM admin dashboard template is a pre-designed ui template to manage customer data, interactions and sales analytics. Built with shadcn/ui, Tailwind CSS, Next.js and React.",
+    title: "Crafty CRM Казахстан",
+    description: "CRM-панель для команды из Казахстана: лиды, продажи и клиенты в одном окне.",
     canonical: "/crm"
   });
 }
@@ -24,10 +23,10 @@ export default function Page() {
   return (
     <MainContent>
       <div className="mb-4 flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
-        <h1 className="text-2xl font-bold tracking-tight">Welcome Mark</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Салем, Айгерим!</h1>
         <div className="flex items-center space-x-2">
           <CalendarDateRangePicker />
-          <Button>Download</Button>
+          <Button>Скачать отчёт</Button>
         </div>
       </div>
       <div className="space-y-4">

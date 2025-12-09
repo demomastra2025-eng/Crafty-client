@@ -9,22 +9,20 @@ interface WelcomeScreenProps {
 
 const suggestions = [
   {
-    title: "Don't worry, this update is quicker than your internet history deletion!",
-    category: "Tech Help"
+    title: "Сформируй КП на русском и казахском",
+    category: "Продажи"
   },
   {
-    title:
-      "A majestic bird soars high above a crystal-clear glacial lake, its wings catching the sunlight.",
-    category: "Creative Writing"
+    title: "Напиши пост в Whatsapp о запуске проекта",
+    category: "Контент"
   },
   {
-    title:
-      "For Wallace the walrus, the perfect day starts with a leisurely swim in the icy Arctic waters",
-    category: "Storytelling"
+    title: "Подготовь ответы на частые вопросы",
+    category: "Поддержка"
   },
   {
-    title: "The best time to stretch is whenever your body feels tight or stiff!",
-    category: "Health & Wellness"
+    title: "Сделай резюме встречи: сроки, бюджет итд",
+    category: "Менеджмент"
   }
 ];
 
@@ -34,10 +32,10 @@ export function WelcomeScreen({ onSuggestionClick }: WelcomeScreenProps) {
       <div className="mb-12 text-center">
         <h1 className="mb-4 text-6xl font-bold">
           <span className="bg-gradient-to-r from-pink-500 via-red-500 to-red-600 bg-clip-text text-transparent">
-            Welcome, John Doe
+            Салем, команда!
           </span>
         </h1>
-        <p className="text-2xl text-gray-500">May I be of assistance today?</p>
+        <p className="text-2xl text-gray-500">Чем помочь проекту сегодня?</p>
       </div>
 
       <div className="grid w-full max-w-4xl grid-cols-1 gap-4 md:grid-cols-2">
@@ -49,7 +47,7 @@ export function WelcomeScreen({ onSuggestionClick }: WelcomeScreenProps) {
             className="group h-auto border-gray-200 p-6 text-left hover:bg-gray-50">
             <div className="flex w-full items-start justify-between">
               <div className="flex-1 pr-4">
-                <p className="text-sm leading-relaxed text-gray-700">{suggestion.title}</p>
+                <p className="break-words text-sm leading-relaxed text-gray-700">{suggestion.title}</p>
               </div>
               <ArrowUpRight className="h-4 w-4 flex-shrink-0 text-gray-400 group-hover:text-gray-600" />
             </div>

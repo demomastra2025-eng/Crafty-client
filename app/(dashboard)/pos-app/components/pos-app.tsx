@@ -54,56 +54,56 @@ const menuItems: MenuItem[] = [
     name: "Duck Salad",
     category: "Pizza",
     price: 35.0,
-    image: "https://bundui-images.netlify.app/avatars/07.png"
+    image: "/logo.png"
   },
   {
     id: "2",
     name: "Breakfast board",
     category: "Taco",
     price: 14.0,
-    image: "https://bundui-images.netlify.app/avatars/07.png"
+    image: "/logo.png"
   },
   {
     id: "3",
     name: "Hummus",
     category: "Sandwich",
     price: 24.0,
-    image: "https://bundui-images.netlify.app/avatars/07.png"
+    image: "/logo.png"
   },
   {
     id: "4",
     name: "Roast beef",
     category: "Kebab",
     price: 17.5,
-    image: "https://bundui-images.netlify.app/avatars/07.png"
+    image: "/logo.png"
   },
   {
     id: "5",
     name: "Tuna salad",
     category: "Popcorn",
     price: 35.0,
-    image: "https://bundui-images.netlify.app/avatars/07.png"
+    image: "/logo.png"
   },
   {
     id: "6",
     name: "Salmon",
     category: "Burger",
     price: 48.0,
-    image: "https://bundui-images.netlify.app/avatars/07.png"
+    image: "/logo.png"
   },
   {
     id: "7",
     name: "California roll",
     category: "Taco",
     price: 74.0,
-    image: "https://bundui-images.netlify.app/avatars/07.png"
+    image: "/logo.png"
   },
   {
     id: "8",
     name: "Sashimi",
     category: "Burrito",
     price: 74.0,
-    image: "https://bundui-images.netlify.app/avatars/07.png"
+    image: "/logo.png"
   }
 ];
 
@@ -250,7 +250,7 @@ export default function PosApp() {
                 <CardContent className="p-0">
                   <div className="relative aspect-video overflow-hidden rounded-t-lg">
                     <Image
-                      src={item.image || "https://bundui-images.netlify.app/avatars/08.png"}
+                      src={item.image || "/logo.png"}
                       alt={item.name}
                       fill
                       className="object-cover"

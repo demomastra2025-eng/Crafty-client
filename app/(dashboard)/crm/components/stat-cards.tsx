@@ -14,29 +14,29 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
 const statsData = [
   {
-    title: "Total Leads",
-    value: "12,486",
+    title: "Лидов всего",
+    value: "12 486",
     change: 15.2,
     icon: Target,
     gradient: "primary" as const
   },
   {
-    title: "Conversion Rate",
+    title: "Конверсия",
     value: "24.8%",
     change: 3.1,
     icon: TrendingUp,
     gradient: "success" as const
   },
   {
-    title: "Total Customers",
-    value: "3,092",
+    title: "Клиентов",
+    value: "3 092",
     change: 8.7,
     icon: Users,
     gradient: "secondary" as const
   },
   {
-    title: "Monthly Revenue",
-    value: "$48,392",
+    title: "Месячная выручка",
+    value: "48 392 000 KZT",
     change: -2.4,
     icon: DollarSign,
     gradient: "warning" as const
@@ -90,7 +90,7 @@ export default function StatCards() {
           </CardContent>
           <CardFooter className="border-border border-t p-0!">
             <Link href="#" className="flex h-full w-full justify-between px-6 py-4 text-sm">
-              View all
+              Посмотреть все
               <ChevronRightIcon className="size-4 opacity-50" />
             </Link>
           </CardFooter>

@@ -12,7 +12,7 @@ export default function StatCards({ totalCustomers, activeCustomers, newCustomer
     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
       <Card>
         <CardHeader>
-          <CardTitle>Total Customers</CardTitle>
+          <CardTitle>Клиентов всего</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2">
@@ -24,7 +24,7 @@ export default function StatCards({ totalCustomers, activeCustomers, newCustomer
 
       <Card>
         <CardHeader>
-          <CardTitle>Active Customers</CardTitle>
+          <CardTitle>Активные</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2">
@@ -36,7 +36,7 @@ export default function StatCards({ totalCustomers, activeCustomers, newCustomer
 
       <Card>
         <CardHeader>
-          <CardTitle>New Customers</CardTitle>
+          <CardTitle>Новые за месяц</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2">

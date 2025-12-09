@@ -39,41 +39,41 @@ import { ChevronsUpDown, Ellipsis } from "lucide-react";
 
 const data: Payment[] = [
   {
-    id: "m5gr84i9",
-    amount: 316,
-    status: "success",
-    email: "ken99@yahoo.com"
+    id: "kz-2401",
+    amount: 12500000,
+    status: "успешно",
+    email: "aida@sales.kz"
   },
   {
-    id: "3u1reuv4",
-    amount: 242,
-    status: "success",
-    email: "Abe45@gmail.com"
+    id: "kz-2402",
+    amount: 7200000,
+    status: "успешно",
+    email: "dias@astana.tech"
   },
   {
-    id: "derv1ws0",
-    amount: 837,
-    status: "processing",
-    email: "Monserrat44@gmail.com"
+    id: "kz-2403",
+    amount: 9800000,
+    status: "в обработке",
+    email: "samat@almaty.agency"
   },
   {
-    id: "5kma53ae",
-    amount: 874,
-    status: "success",
-    email: "Silas22@gmail.com"
+    id: "kz-2404",
+    amount: 15400000,
+    status: "успешно",
+    email: "aliya@nur-sultan.com"
   },
   {
-    id: "bhqecj4p",
-    amount: 721,
-    status: "failed",
-    email: "carmella@hotmail.com"
+    id: "kz-2405",
+    amount: 4300000,
+    status: "неуспешно",
+    email: "arkan@shymkent.io"
   }
 ];
 
 export type Payment = {
   id: string;
   amount: number;
-  status: "pending" | "processing" | "success" | "failed";
+  status: "pending" | "processing" | "success" | "failed" | "успешно" | "в обработке" | "неуспешно";
   email: string;
 };
 
@@ -101,7 +101,7 @@ export const columns: ColumnDef<Payment>[] = [
   },
   {
     accessorKey: "status",
-    header: "Status",
+    header: "Статус",
     cell: ({ row }) => <div className="capitalize">{row.getValue("status")}</div>
   },
   {
@@ -111,7 +111,7 @@ export const columns: ColumnDef<Payment>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          Email
+          Почта
           <ChevronsUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -120,14 +120,15 @@ export const columns: ColumnDef<Payment>[] = [
   },
   {
     accessorKey: "amount",
-    header: () => <div className="text-right">Amount</div>,
+    header: () => <div className="text-right">Сумма</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("amount"));
 
-      // Format the amount as a dollar amount
-      const formatted = new Intl.NumberFormat("en-US", {
+      // Формат суммы в тенге
+      const formatted = new Intl.NumberFormat("ru-KZ", {
         style: "currency",
-        currency: "USD"
+        currency: "KZT",
+        minimumFractionDigits: 0
       }).format(amount);
 
       return <div className="text-right font-medium">{formatted}</div>;
@@ -148,13 +149,13 @@ export const columns: ColumnDef<Payment>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Действия</DropdownMenuLabel>
             <DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.id)}>
-              Copy payment ID
+              Скопировать ID сделки
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            <DropdownMenuItem>Открыть клиента</DropdownMenuItem>
+            <DropdownMenuItem>Посмотреть детали оплаты</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
@@ -190,10 +191,10 @@ export function LeadsCard({ className }: { className?: string }) {
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle>Leads</CardTitle>
+        <CardTitle>Лиды</CardTitle>
         <CardAction>
           <Input
-            placeholder="Filter leads..."
+            placeholder="Фильтр по email..."
             value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
             onChange={(event) => table.getColumn("email")?.setFilterValue(event.target.value)}
           />
@@ -231,7 +232,7 @@ export function LeadsCard({ className }: { className?: string }) {
               ) : (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">
-                    No results.
+                    Нет данных.
                   </TableCell>
                 </TableRow>
               )}
@@ -240,8 +241,8 @@ export function LeadsCard({ className }: { className?: string }) {
         </div>
         <div className="flex items-center justify-end space-x-2 pt-4">
           <div className="text-muted-foreground flex-1 text-sm">
-            {table.getFilteredSelectedRowModel().rows.length} of{" "}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
+            Выбрано {table.getFilteredSelectedRowModel().rows.length} из{" "}
+            {table.getFilteredRowModel().rows.length}
           </div>
           <div className="space-x-2">
             <Button
@@ -249,14 +250,14 @@ export function LeadsCard({ className }: { className?: string }) {
               size="sm"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}>
-              Previous
+              Назад
             </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}>
-              Next
+              Далее
             </Button>
           </div>
         </div>

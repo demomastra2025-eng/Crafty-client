@@ -5,7 +5,7 @@ export const transactions = [
     date: "Dec 21, 2021 - 08:05",
     amount: 660.22,
     type: "income",
-    avatar: "https://bundui-images.netlify.app/avatars/06.png"
+    avatar: "/logo.png"
   },
   {
     id: 2,
@@ -13,7 +13,7 @@ export const transactions = [
     date: "Dec 19, 2021 - 11:55",
     amount: -33.63,
     type: "expense",
-    avatar: "https://bundui-images.netlify.app/avatars/09.png"
+    avatar: "/logo.png"
   },
   {
     id: 3,
@@ -21,7 +21,7 @@ export const transactions = [
     date: "Dec 16, 2021 - 14:45",
     amount: 674.63,
     type: "income",
-    avatar: "https://bundui-images.netlify.app/avatars/09.png"
+    avatar: "/logo.png"
   },
   {
     id: 4,
@@ -29,7 +29,7 @@ export const transactions = [
     date: "Dec 13, 2021 - 11:30",
     amount: 547.63,
     type: "income",
-    avatar: "https://bundui-images.netlify.app/avatars/09.png"
+    avatar: "/logo.png"
   },
   {
     id: 5,
@@ -37,7 +37,7 @@ export const transactions = [
     date: "Dec 10, 2021 - 09:41",
     amount: -736.24,
     type: "expense",
-    avatar: "https://bundui-images.netlify.app/avatars/09.png"
+    avatar: "/logo.png"
   },
   {
     id: 6,
@@ -45,15 +45,15 @@ export const transactions = [
     date: "Dec 09, 2021 - 19:36",
     amount: 369.6,
     type: "income",
-    avatar: "https://bundui-images.netlify.app/avatars/09.png"
+    avatar: "/logo.png"
   }
 ];
 
 export const contacts = [
-  { id: 1, name: "KG", avatar: "https://bundui-images.netlify.app/avatars/07.png", initials: "KG" },
-  { id: 2, name: "SS", avatar: "https://bundui-images.netlify.app/avatars/07.png", initials: "SS" },
-  { id: 3, name: "J", avatar: "https://bundui-images.netlify.app/avatars/07.png", initials: "J" },
-  { id: 4, name: "LT", avatar: "https://bundui-images.netlify.app/avatars/07.png", initials: "LT" }
+  { id: 1, name: "KG", avatar: "/logo.png", initials: "KG" },
+  { id: 2, name: "SS", avatar: "/logo.png", initials: "SS" },
+  { id: 3, name: "J", avatar: "/logo.png", initials: "J" },
+  { id: 4, name: "LT", avatar: "/logo.png", initials: "LT" }
 ];
 
 export const creditCards = [

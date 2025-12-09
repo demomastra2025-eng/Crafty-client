@@ -96,7 +96,7 @@ export default async function Page() {
               <div className="relative inline-block">
                 <div className="relative h-32 w-32 overflow-hidden rounded-full bg-gray-200">
                   <Image
-                    src="https://bundui-images.netlify.app/avatars/01.png"
+                    src="/logo.png"
                     alt="Profile picture"
                     width={128}
                     height={128}

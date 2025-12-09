@@ -10,23 +10,23 @@ export default function NewCustomer() {
       <SheetTrigger asChild>
         <Button>
           <UserPlus />
-          New customer
+          Новый клиент
         </Button>
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Add New Customer</SheetTitle>
+          <SheetTitle>Добавить клиента</SheetTitle>
         </SheetHeader>
         <div className="grid gap-4 p-4">
           <div className="grid gap-2">
-            <Label htmlFor="name">Name</Label>
-            <Input id="name" placeholder="Enter customer name" />
+            <Label htmlFor="name">Имя</Label>
+            <Input id="name" placeholder="Введите имя клиента" />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="phone">Phone</Label>
-            <Input id="phone" placeholder="Enter phone number" />
+            <Label htmlFor="phone">Телефон</Label>
+            <Input id="phone" placeholder="+7 (___) ___-__-__" />
           </div>
-          <Button className="w-full">Add Customer</Button>
+          <Button className="w-full">Сохранить</Button>
         </div>
       </SheetContent>
     </Sheet>

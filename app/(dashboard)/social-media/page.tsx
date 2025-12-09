@@ -96,7 +96,7 @@ export default function Page() {
           <div className="border-border border-b p-4">
             <div className="flex space-x-3">
               <Avatar>
-                <AvatarImage src="https://bundui-images.netlify.app/avatars/09.png" />
+                <AvatarImage src="/logo.png" />
                 <AvatarFallback>U</AvatarFallback>
               </Avatar>
               <div className="flex-1">
@@ -131,7 +131,7 @@ export default function Page() {
             <div className="border-border border-b p-4 hover:bg-gray-50/50">
               <div className="flex space-x-3">
                 <Avatar>
-                  <AvatarImage src="https://bundui-images.netlify.app/avatars/09.png" />
+                  <AvatarImage src="/logo.png" />
                   <AvatarFallback>MS</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
@@ -183,7 +183,7 @@ export default function Page() {
             <div className="border-border border-b p-4 hover:bg-gray-50/50">
               <div className="flex space-x-3">
                 <Avatar>
-                  <AvatarImage src="https://bundui-images.netlify.app/avatars/09.png" />
+                  <AvatarImage src="/logo.png" />
                   <AvatarFallback>S</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
@@ -251,7 +251,7 @@ export default function Page() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src="https://bundui-images.netlify.app/avatars/09.png" />
+                      <AvatarImage src="/logo.png" />
                       <AvatarFallback>G</AvatarFallback>
                     </Avatar>
                     <div>
@@ -270,7 +270,7 @@ export default function Page() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src="https://bundui-images.netlify.app/avatars/09.png" />
+                      <AvatarImage src="/logo.png" />
                       <AvatarFallback>NS</AvatarFallback>
                     </Avatar>
                     <div>
@@ -289,7 +289,7 @@ export default function Page() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src="https://bundui-images.netlify.app/avatars/09.png" />
+                      <AvatarImage src="/logo.png" />
                       <AvatarFallback>LR</AvatarFallback>
                     </Avatar>
                     <div>

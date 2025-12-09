@@ -1,147 +1,51 @@
-import {
-  IconChartBar,
-  IconDashboard,
-  IconFolder,
-  IconListDetails,
-  IconUsers
-} from "@tabler/icons-react";
+import { IconDashboard, IconListDetails, IconRobot, IconUsers, IconHome, IconBrandWhatsapp } from "@tabler/icons-react";
 import { KanbanIcon } from "lucide-react";
 
 export const sidebarData = {
   user: {
-    name: "Marc",
-    email: "m@example.com",
-    avatar: "https://bundui-images.netlify.app/avatars/08.png"
+    name: "Ахан",
+    email: "bakhitov.akhan@gmail.com",
+    avatar: "/logo.png"
   },
   navMain: [
     {
-      title: "Main",
+      title: "Главное",
       items: [
-        {
-          title: "Ecommerce",
-          url: "/ecommerce",
-          icon: IconDashboard,
-          items: [
-            {
-              title: "Dashboard",
-              url: "/ecommerce"
-            },
-            {
-              title: "Checkout",
-              url: "/checkout"
-            },
-            {
-              title: "Order Receipt",
-              url: "/order-receipt"
-            },
-            {
-              title: "Product Filter",
-              url: "/product-filter"
-            }
-          ]
-        },
         {
           title: "CRM",
           url: "/crm",
           icon: IconDashboard,
-          items: [
-            {
-              title: "Dashboard",
-              url: "/crm"
-            },
-            {
-              title: "Customers",
-              url: "/customers"
-            },
-            {
-              title: "Customer Details",
-              url: "/customer-details"
-            },
-            {
-              title: "Customer Details v2",
-              url: "/customer-details-v2"
-            }
-          ]
         },
         {
-          title: "Banking",
-          url: "/banking",
-          icon: IconDashboard
-        },
-        {
-          title: "AI Chat",
-          url: "/ai-chat",
-          icon: IconUsers
-        },
-        {
-          title: "Chats",
+          title: "Чаты",
           url: "/chats",
           icon: IconUsers
         },
         {
-          title: "Kanban Board",
+          title: "Канбан",
           url: "/kanban-board",
           icon: KanbanIcon
         },
         {
-          title: "POS App",
-          url: "/pos-app",
-          icon: IconFolder
-        },
-        {
-          title: "Social Media",
-          url: "/social-media",
-          icon: IconChartBar
-        },
-        {
-          title: "Real Estate Listings",
+          title: "Недвижимость",
           url: "/real-estate-listings",
-          icon: IconFolder
+          icon: IconHome
         },
         {
-          title: "Job Postings",
-          url: "/job-postings",
-          icon: IconFolder
+          title: "Клиенты",
+          url: "/customers",
+          icon: IconListDetails,
         },
         {
-          title: "Contacts",
-          url: "/contacts",
-          icon: IconListDetails
+          title: "AI-чат",
+          url: "/ai-chat",
+          icon: IconRobot
         },
         {
-          title: "Projects",
-          url: "/projects-list",
-          icon: IconFolder
+          title: "Коннекты",
+          url: "/connections",
+          icon: IconBrandWhatsapp
         },
-        {
-          title: "User Profile",
-          url: "/user-profile",
-          icon: IconChartBar
-        },
-        {
-          title: "Settings",
-          url: "/settings",
-          icon: IconFolder
-        },
-        {
-          title: "Empty State",
-          url: "/empty-states",
-          icon: IconDashboard,
-          items: [
-            {
-              title: "Empty State 01",
-              url: "/empty-states"
-            },
-            {
-              title: "Empty State 02",
-              url: "/empty-states-02"
-            },
-            {
-              title: "Empty State 03",
-              url: "/empty-states-03"
-            }
-          ]
-        }
       ]
     }
   ]

@@ -11,7 +11,7 @@ export default function Logo(props: Props) {
   return (
     <Link href="/" {...props}>
       <Image src="/logo.png" alt="logo" width={28} height={28} className="rounded-md" />
-      <span className="text-base font-semibold">Shadcn Dashboard</span>
+      <span className="text-base font-semibold">Crafty</span>
     </Link>
   );
 }

@@ -4,9 +4,9 @@ import { generateMeta } from "@/lib/generate-meta";
 
 export async function generateMetadata(): Promise<Metadata> {
   return generateMeta({
-    title: "Real Estate Listings",
+    title: "Объекты по недвижимости",
     description:
-      "Real estate listings are structured displays of properties for sale or rent with key details. Built with shadcn/ui, Tailwind CSS, Next.js and React.",
+      "Витрина объектов недвижимости по Казахстану: ЖК, апартаменты и коммерция с ключевыми данными.",
     canonical: "/real-estate-listings"
   });
 }

@@ -14,17 +14,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
           priority: 1
         });
       }
-
-      if (route.items?.length) {
-        route.items.forEach((route) => {
-          pageRoutesLinks.push({
-            url: `${process.env.BASE_URL}${route.url}`,
-            lastModified: new Date(),
-            changeFrequency: "weekly",
-            priority: 1
-          });
-        });
-      }
     });
   });
 

@@ -4,9 +4,8 @@ import { generateMeta } from "@/lib/generate-meta";
 
 export async function generateMetadata(): Promise<Metadata> {
   return generateMeta({
-    title: "Chat App",
-    description:
-      "Chat app is a ui template used for instant messaging and communication between users. Built with shadcn/ui, Tailwind CSS, Next.js and React.",
+    title: "Crafty чат Казахстан",
+    description: "Командный чат для казахстанского проекта: сделки, клиенты и поддержка.",
     canonical: "/chats"
   });
 }

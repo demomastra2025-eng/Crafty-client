@@ -34,7 +34,7 @@ export function ProfileSettings() {
         <div className="flex items-center gap-4">
           <Avatar className="h-20 w-20">
             <AvatarImage
-              src="https://bundui-images.netlify.app/avatars/08.png?height=80&width=80"
+              src="/logo.png"
               alt="Profile picture"
             />
             <AvatarFallback className="bg-background">AG</AvatarFallback>
@@ -94,7 +94,7 @@ export function ProfileSettings() {
                   <SelectItem value="United States">
                     <div className="flex items-center gap-2">
                       <Image
-                        src="https://bundui-images.netlify.app/avatars/08.png?height=16&width=16"
+                        src="/logo.png"
                         alt="US Flag"
                         width={16}
                         height={16}
@@ -105,7 +105,7 @@ export function ProfileSettings() {
                   <SelectItem value="Canada">
                     <div className="flex items-center gap-2">
                       <Image
-                        src="https://bundui-images.netlify.app/avatars/08.png?height=16&width=16"
+                        src="/logo.png"
                         alt="Canada Flag"
                         width={16}
                         height={16}

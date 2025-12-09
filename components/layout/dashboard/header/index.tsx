@@ -22,7 +22,7 @@ export default function Header() {
       <Search />
       <div className="flex grow justify-end gap-1">
         <Messages />
-        <Notifications />
+        {/* <Notifications /> */}
         <ThemeSwitch />
         <UserMenu />
       </div>

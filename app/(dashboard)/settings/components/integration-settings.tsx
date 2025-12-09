@@ -70,7 +70,7 @@ export function IntegrationSettings() {
           <div key={integration.name} className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Image
-                src={`https://bundui-images.netlify.app/avatars/07.png&query=${integration.logoQuery}`}
+                src={`/logo.png${integration.logoQuery}`}
                 alt={`${integration.name} logo`}
                 width={32}
                 height={32}
