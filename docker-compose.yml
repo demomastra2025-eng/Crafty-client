@@ -1,0 +1,14 @@
+services:
+  crafty-client:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: crafty_client
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"
+    env_file:
+      - .env

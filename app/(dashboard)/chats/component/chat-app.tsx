@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase-client";
 import { ConversationList } from "@/app/(dashboard)/chats/component/conversation-list";
 import { ChatArea } from "@/app/(dashboard)/chats/component/chat-area";
@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { formatDateTimeWithTz } from "@/lib/timezone";
 
 type MessageKey = {
   id?: string | null;
@@ -43,12 +44,15 @@ type MessageKey = {
   fromMe?: boolean | null;
 };
 
+type FileLength = number | { low?: number; high?: number; unsigned?: boolean };
+
 type MediaMessage = {
   url?: string;
   directPath?: string;
   caption?: string;
   fileName?: string;
   mimetype?: string;
+  fileLength?: FileLength | null;
 };
 
 type MessageContent = {
@@ -58,6 +62,7 @@ type MessageContent = {
   videoMessage?: MediaMessage;
   documentMessage?: MediaMessage;
   audioMessage?: MediaMessage;
+  mediaUrl?: string | null;
 };
 
 type MessageRow = {
@@ -71,11 +76,13 @@ type MessageRow = {
   source?: string | null;
   chatId?: string | null;
   labels?: string | null;
+  instanceId?: string | null;
 };
 
 type MessageUpdateRow = {
   messageId?: string;
   status?: string | null;
+  instanceId?: string | null;
 };
 
 type ChatRow = {
@@ -87,6 +94,7 @@ type ChatRow = {
   createdAt?: string | null;
   instanceId: string;
   labels?: string | null;
+  is_ai?: boolean | null;
 };
 
 type Conversation = {
@@ -103,6 +111,7 @@ type Conversation = {
   status: string;
   labels?: LabelTag[];
   instanceId?: string;
+  isAi?: boolean;
 };
 
 type Message = {
@@ -116,14 +125,16 @@ type Message = {
   isOwn: boolean;
   status?: string;
   keyId?: string;
-  attachments?: Array<{
-    type: "image" | "video" | "document" | "audio";
-    url?: string;
-    name?: string;
-    caption?: string;
-    mimetype?: string;
-    sizeBytes?: number;
-  }>;
+  attachments?: Attachment[];
+};
+
+type Attachment = {
+  type: "image" | "video" | "document" | "audio";
+  url?: string;
+  name?: string;
+  caption?: string;
+  mimetype?: string;
+  sizeBytes?: number;
 };
 
 type Contact = {
@@ -163,13 +174,7 @@ const fallbackAvatar = "/logo.png";
 
 function formatTimestampFromSeconds(seconds?: number | null) {
   if (!seconds) return "";
-  const date = new Date(seconds * 1000);
-  return date.toLocaleString("ru-RU", {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit"
-  });
+  return formatDateTimeWithTz(seconds * 1000);
 }
 
 function extractText(message?: MessageContent | null) {
@@ -187,9 +192,9 @@ function extractAttachments(
   message?: MessageContent | null,
   opts?: { allowMmg?: boolean; allowMmgForDocuments?: boolean }
 ) {
-  const attachments: Message["attachments"] = [];
+  const attachments: Attachment[] = [];
   if (!message) return attachments;
-  const mediaUrl = (message as any)?.mediaUrl as string | undefined | null;
+  const mediaUrl = message.mediaUrl ?? undefined;
   const normalizeUrl = (value?: string | null, allowMmgOverride = false) => {
     if (!value) return undefined;
     // Ссылки mmg.whatsapp.net без авторизации обычно не грузятся в браузере. Для исходящих сообщений
@@ -198,8 +203,9 @@ function extractAttachments(
     if (value.startsWith("/")) return undefined;
     return value;
   };
-  const parseFileLength = (input?: { low?: number; high?: number; unsigned?: boolean }) => {
+  const parseFileLength = (input?: FileLength | null) => {
     if (!input) return undefined;
+    if (typeof input === "number") return input;
     const low = input.low || 0;
     const high = input.high || 0;
     return high ? high * 2 ** 32 + low : low;
@@ -215,7 +221,7 @@ function extractAttachments(
       caption: message.imageMessage.caption,
       name: message.imageMessage.fileName,
       mimetype: message.imageMessage.mimetype,
-      sizeBytes: parseFileLength(message.imageMessage.fileLength as any)
+      sizeBytes: parseFileLength(message.imageMessage.fileLength)
     });
   }
 
@@ -229,7 +235,7 @@ function extractAttachments(
       caption: message.videoMessage.caption,
       name: message.videoMessage.fileName,
       mimetype: message.videoMessage.mimetype,
-      sizeBytes: parseFileLength(message.videoMessage.fileLength as any)
+      sizeBytes: parseFileLength(message.videoMessage.fileLength)
     });
   }
 
@@ -242,7 +248,7 @@ function extractAttachments(
         normalizeUrl(mediaUrl, opts?.allowMmgForDocuments),
       name: message.documentMessage.fileName,
       mimetype: message.documentMessage.mimetype,
-      sizeBytes: parseFileLength(message.documentMessage.fileLength as any)
+      sizeBytes: parseFileLength(message.documentMessage.fileLength)
     });
   }
 
@@ -255,7 +261,7 @@ function extractAttachments(
         normalizeUrl(mediaUrl),
       name: message.audioMessage.fileName,
       mimetype: message.audioMessage.mimetype,
-      sizeBytes: parseFileLength(message.audioMessage.fileLength as any)
+      sizeBytes: parseFileLength(message.audioMessage.fileLength)
     });
   }
 
@@ -276,7 +282,7 @@ function sortConversationsByTime(list: Conversation[]) {
 const stripWhatsappSuffix = (value?: string | null) =>
   (value || "").replace(/@s\.whatsapp\.net$/, "");
 
-function mapMediaAttachment(media?: MediaRow): Message["attachments"][number] | null {
+function mapMediaAttachment(media?: MediaRow): Attachment | null {
   if (!media) return null;
   const type = (media.type || "").toLowerCase();
   const normalizedType =
@@ -311,31 +317,37 @@ function parseLabels(raw?: string | string[] | null): string[] {
   return [];
 }
 
+const CHAT_PAGE_SIZE = 20;
+
 export default function ChatApp() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [showProfile, setShowProfile] = useState(false);
   const [loadingChats, setLoadingChats] = useState(false);
+  const [loadingMoreChats, setLoadingMoreChats] = useState(false);
   const [contactByRemote, setContactByRemote] = useState<Record<string, Contact>>({});
   const [instanceStatuses, setInstanceStatuses] = useState<Record<string, string>>({});
   const [instanceNames, setInstanceNames] = useState<Record<string, string>>({});
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [instanceName, setInstanceName] = useState<string | null>(null);
   const [preferredInstanceId, setPreferredInstanceId] = useState<string | null>(null);
   const [tab, setTab] = useState<"chats" | "groups" | "archive">("chats");
   const [labelsById, setLabelsById] = useState<Record<string, LabelTag>>({});
+  const [chatPage, setChatPage] = useState(0);
+  const [hasMoreChats, setHasMoreChats] = useState(true);
   const availableLabels = useMemo(() => Object.values(labelsById), [labelsById]);
   const searchParams = useSearchParams();
-  const router = useRouter();
   const [qrData, setQrData] = useState<string | null>(null);
   const { toast } = useToast();
+  const [aiUpdating, setAiUpdating] = useState(false);
 
   useEffect(() => {
     const saved = readPreferredInstance();
     if (saved?.name) setInstanceName(saved.name);
     if (saved?.id) setPreferredInstanceId(saved.id);
-    loadChats(saved?.name || null, saved?.id || null);
+    loadChats(saved?.name || null, saved?.id || null, { search: debouncedSearch });
   }, []);
 
   useEffect(() => {
@@ -349,9 +361,14 @@ export default function ChatApp() {
   }, [instanceName]);
 
   useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search.trim()), 300);
+    return () => clearTimeout(t);
+  }, [search]);
+
+  useEffect(() => {
     if (!instanceName && !preferredInstanceId) return;
-    loadChats(instanceName || null, preferredInstanceId);
-  }, [instanceName, preferredInstanceId]);
+    loadChats(instanceName || null, preferredInstanceId, { search: debouncedSearch });
+  }, [instanceName, preferredInstanceId, debouncedSearch]);
 
   useEffect(() => {
     const instId = selectedConversation?.instanceId;
@@ -398,31 +415,52 @@ export default function ChatApp() {
     [selectedConversation]
   );
 
-  async function loadChats(preferredInstanceName?: string | null, preferredInstanceId?: string | null) {
-    setLoadingChats(true);
+  async function loadChats(
+    preferredInstanceName?: string | null,
+    preferredInstanceId?: string | null,
+    opts?: { page?: number; append?: boolean; search?: string }
+  ) {
+    const page = opts?.page ?? 0;
+    const append = opts?.append ?? false;
+    const searchTerm = (opts?.search || "").trim();
+    const from = page * CHAT_PAGE_SIZE;
+    const to = from + CHAT_PAGE_SIZE - 1;
+    const setLoadingFn = append ? setLoadingMoreChats : setLoadingChats;
+    setChatPage(page);
+    if (!append && page === 0) {
+      setConversations([]);
+      setHasMoreChats(true);
+    }
+    setLoadingFn(true);
     try {
-      const chatQuery = supabase
+      let chatQuery = supabase
         .from("Chat")
-        .select("id,remoteJid,name,unreadMessages,updatedAt,createdAt,instanceId,labels");
-      const contactQuery = supabase
+        .select("id,remoteJid,name,unreadMessages,updatedAt,createdAt,instanceId,labels,is_ai")
+        .order("updatedAt", { ascending: false })
+        .range(from, to);
+      if (preferredInstanceId) {
+        chatQuery = chatQuery.eq("instanceId", preferredInstanceId);
+      }
+      if (searchTerm) {
+        const like = `%${searchTerm}%`;
+        chatQuery = chatQuery.or(`name.ilike.${like},remoteJid.ilike.${like}`);
+      }
+
+      let contactQuery = supabase
         .from("Contact")
         .select("remoteJid,pushName,profilePicUrl,instanceId");
-      const messageQuery = supabase
-        .from("Message")
-        .select("id,key,message,messageTimestamp,pushName,status,source,messageType,instanceId")
-        .order("messageTimestamp", { ascending: false })
-        .limit(200);
+      if (preferredInstanceId) {
+        contactQuery = contactQuery.eq("instanceId", preferredInstanceId);
+      }
 
       const [
         { data: chatRows, error: chatError },
         { data: contactRows },
-        { data: recentMessages },
         { data: instances },
         { data: labelRows }
       ] = await Promise.all([
-        preferredInstanceId ? chatQuery.eq("instanceId", preferredInstanceId) : chatQuery,
-        preferredInstanceId ? contactQuery.eq("instanceId", preferredInstanceId) : contactQuery,
-        preferredInstanceId ? messageQuery.eq("instanceId", preferredInstanceId) : messageQuery,
+        chatQuery,
+        contactQuery,
         supabase.from("Instance").select("id,name,connectionStatus"),
         supabase.from("Label").select("labelId,name,color,instanceId")
       ]);
@@ -430,6 +468,31 @@ export default function ChatApp() {
       if (chatError) {
         console.error("Ошибка загрузки чатов:", chatError);
         return;
+      }
+
+      const remoteJids = (chatRows || [])
+        .map((row) => (row as ChatRow).remoteJid)
+        .filter(Boolean);
+      let recentMessages: MessageRow[] = [];
+      if (remoteJids.length) {
+        let messageQuery = supabase
+          .from("Message")
+          .select("id,key,message,messageTimestamp,pushName,status,source,messageType,instanceId")
+          .order("messageTimestamp", { ascending: false })
+          .limit(Math.max(remoteJids.length * 3, CHAT_PAGE_SIZE));
+        if (preferredInstanceId) {
+          messageQuery = messageQuery.eq("instanceId", preferredInstanceId);
+        }
+        const remoteFilter = remoteJids.map((jid) => `key->>remoteJid.eq.${jid}`).join(",");
+        if (remoteFilter) {
+          messageQuery = messageQuery.or(remoteFilter);
+        }
+        const { data: messageRows, error: messageError } = await messageQuery;
+        if (messageError) {
+          console.error("Ошибка загрузки сообщений:", messageError);
+        } else {
+          recentMessages = (messageRows || []) as MessageRow[];
+        }
       }
 
       const contactMap: Record<string, Contact> = {};
@@ -491,11 +554,13 @@ export default function ChatApp() {
         return (chat as ChatRow).instanceId === targetInstanceId;
       });
 
-      const mapped: Conversation[] = filteredChats.map((chat) => {
+      const mapped: Conversation[] = filteredChats.reduce<Conversation[]>((acc, chat) => {
         const chatRow = chat as ChatRow;
-        const contact = contactMap[chatRow.remoteJid];
-        const lastMsg = lastMessageByRemote[chatRow.remoteJid];
-        const lastIncoming = lastIncomingByRemote[chatRow.remoteJid];
+        const remote = chatRow.remoteJid || "";
+        if (!remote) return acc;
+        const contact = contactMap[remote];
+        const lastMsg = lastMessageByRemote[remote];
+        const lastIncoming = lastIncomingByRemote[remote];
         const lastText = extractText(lastMsg?.message);
         const lastTs = lastMsg?.messageTimestamp
           ? lastMsg.messageTimestamp * 1000
@@ -505,12 +570,7 @@ export default function ChatApp() {
         const tsString = lastMsg?.messageTimestamp
           ? formatTimestampFromSeconds(lastMsg.messageTimestamp)
           : chatRow.updatedAt
-            ? new Date(chatRow.updatedAt).toLocaleString("ru-RU", {
-                day: "2-digit",
-                month: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit"
-              })
+            ? formatDateTimeWithTz(chatRow.updatedAt)
             : "";
         const status =
           instanceMap[chatRow.instanceId] === "open"
@@ -526,9 +586,9 @@ export default function ChatApp() {
         const rawName = chatRow.name || contact?.pushName || chatRow.remoteJid;
         const cleanName = stripWhatsappSuffix(rawName) || "Неизвестный контакт";
 
-        return {
+        acc.push({
           id: chatRow.id,
-          remoteJid: chatRow.remoteJid,
+          remoteJid: remote,
           name: cleanName,
           avatar: contact?.profilePicUrl || fallbackAvatar,
           lastMessage: lastText || "Нет сообщений",
@@ -539,17 +599,42 @@ export default function ChatApp() {
           isActive: false,
           status,
           labels: parsedLabels,
-          instanceId: chatRow.instanceId
-        };
-      });
+          instanceId: chatRow.instanceId,
+          isAi: Boolean(chatRow.is_ai)
+        });
+        return acc;
+      }, []);
 
       const sorted = sortConversationsByTime(mapped);
-      setConversations(sorted);
-      const paramJid = searchParams?.get("jid");
-      const found = paramJid ? sorted.find((c) => c.remoteJid === paramJid) : null;
-      setSelectedConversation((prev) => prev || found || sorted[0] || null);
+      setHasMoreChats(filteredChats.length === CHAT_PAGE_SIZE);
+      setChatPage(page);
+      setConversations((prev) => {
+        const merged = append ? [...prev, ...sorted] : sorted;
+        const dedupedById: Record<string, Conversation> = {};
+        merged.forEach((item) => {
+          const key = item.id || item.remoteJid;
+          if (!key) return;
+          const existing = dedupedById[key];
+          if (!existing || (item.lastMessageTs || 0) > (existing.lastMessageTs || 0)) {
+            dedupedById[key] = item;
+          }
+        });
+        return sortConversationsByTime(Object.values(dedupedById));
+      });
+      if (!append) {
+        const paramJid = searchParams?.get("jid");
+        setSelectedConversation((prev) => {
+          const hasPrev = sorted.some((c) => prev && c.remoteJid === prev.remoteJid);
+          if (prev && hasPrev) return prev;
+          const found = paramJid ? sorted.find((c) => c.remoteJid === paramJid) : null;
+          return found || sorted[0] || null;
+        });
+      }
     } finally {
-      setLoadingChats(false);
+      setLoadingFn(false);
+      if (!append) {
+        setLoadingMoreChats(false);
+      }
     }
   }
 
@@ -570,7 +655,7 @@ export default function ChatApp() {
     if (targetInstanceId) {
       messageFetcher = messageFetcher.eq("instanceId", targetInstanceId);
     }
-    messageFetcher.then(async ({ data, error }) => {
+      messageFetcher.then(async ({ data, error }) => {
         if (error) {
           console.error("Ошибка загрузки сообщений:", error);
           setMessages([]);
@@ -646,7 +731,7 @@ export default function ChatApp() {
         },
         (payload) => {
           const row = payload.new as MessageRow;
-          if (preferredInstanceId && (row as any)?.instanceId !== preferredInstanceId) return;
+          if (preferredInstanceId && row.instanceId && row.instanceId !== preferredInstanceId) return;
           const remote = row?.key?.remoteJid || row?.key?.remoteJidAlt;
           if (!remote) return;
 
@@ -670,7 +755,8 @@ export default function ChatApp() {
                 lastSource: message.source,
                 unreadCount: message.isOwn ? 0 : 1,
                 isActive: false,
-                status: "Новый"
+                status: "Новый",
+                isAi: false
               });
             } else {
               const updated = {
@@ -721,7 +807,7 @@ export default function ChatApp() {
         },
         (payload) => {
           const upd = payload.new as MessageUpdateRow;
-          if (preferredInstanceId && (upd as any)?.instanceId !== preferredInstanceId) return;
+          if (preferredInstanceId && upd.instanceId && upd.instanceId !== preferredInstanceId) return;
           setMessages((prev) =>
             prev.map((m) =>
               m.id === upd.messageId
@@ -742,7 +828,8 @@ export default function ChatApp() {
         (payload) => {
           const updatedChat = payload.new as ChatRow;
           if (preferredInstanceId && updatedChat.instanceId !== preferredInstanceId) return;
-          if (!updatedChat) return;
+          if (!updatedChat || !updatedChat.remoteJid) return;
+          let latestBase: Conversation | null = null;
           setConversations((prev) => {
             const idx = prev.findIndex((c) => c.id === updatedChat.id);
             const base = {
@@ -757,12 +844,7 @@ export default function ChatApp() {
               lastMessage: prev[idx]?.lastMessage || "",
               timestamp:
                 updatedChat.updatedAt && !Number.isNaN(Date.parse(updatedChat.updatedAt))
-                  ? new Date(updatedChat.updatedAt).toLocaleString("ru-RU", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      hour: "2-digit",
-                      minute: "2-digit"
-                    })
+                  ? formatDateTimeWithTz(updatedChat.updatedAt)
                   : prev[idx]?.timestamp || "",
               lastMessageTs: updatedChat.updatedAt ? Date.parse(updatedChat.updatedAt) : prev[idx]?.lastMessageTs || 0,
               lastSource: prev[idx]?.lastSource,
@@ -771,8 +853,10 @@ export default function ChatApp() {
               status: instanceStatuses[updatedChat.instanceId] === "open" ? "Онлайн" : "Не в сети",
               labels: parseLabels(updatedChat.labels).map(
                 (id) => labelsById[id] || { labelId: id, name: id }
-              )
+              ),
+              isAi: Boolean(updatedChat.is_ai)
             };
+            latestBase = base;
 
             const next = [...prev];
             if (idx === -1) {
@@ -784,6 +868,9 @@ export default function ChatApp() {
             }
             return sortConversationsByTime(next);
           });
+          setSelectedConversation((prev) =>
+            prev && prev.id === updatedChat.id && latestBase ? { ...prev, ...latestBase } : prev
+          );
         }
       )
       .subscribe();
@@ -797,27 +884,33 @@ export default function ChatApp() {
     // Авто-пометка прочитанного убрана: делать вручную по действию
   }, [selectedConversation]);
 
-  function mapMessageRow(m: MessageRow, mediaAttachments?: Message["attachments"]): Message {
+  function mapMessageRow(m: MessageRow, mediaAttachments?: Attachment[]): Message {
     const fromPayload = extractAttachments(m.message, {
       allowMmg: Boolean(m.key?.fromMe),
       allowMmgForDocuments: true
     });
-    const mergedAttachments = [...fromPayload];
-    if (mediaAttachments?.length) {
-      mergedAttachments.push(...mediaAttachments);
-    }
+    const mergedAttachments: Attachment[] = [...fromPayload, ...(mediaAttachments || [])];
     const dedupedAttachments = (() => {
-      const seen = new Set<string>();
-      const isMedia = (att: Message["attachments"][number]) =>
-        att.type === "image" || att.type === "video" || att.type === "audio";
-      return mergedAttachments.reduce<Message["attachments"]>((acc, att) => {
-        if (isMedia(att) && !att.url) return acc; // медиавложение без ссылки не показываем
-        const key = `${att.type}-${att.url || att.name || ""}`;
-        if (seen.has(key)) return acc;
-        seen.add(key);
-        acc.push(att);
-        return acc;
-      }, []);
+      const byType: Record<string, Attachment> = {};
+      mergedAttachments.forEach((att) => {
+        const key = att.type;
+        const existing = byType[key];
+        // Пропускаем медиавложения без ссылки, если есть альтернатива с ссылкой
+        if (existing) {
+          const hasUrl = Boolean(att.url);
+          const existingHasUrl = Boolean(existing.url);
+          if (!existingHasUrl && hasUrl) {
+            byType[key] = att;
+          } else if (existingHasUrl && hasUrl && !existing.caption && att.caption) {
+            byType[key] = { ...existing, caption: att.caption };
+          }
+        } else {
+          if (att.url || !["image", "video", "audio"].includes(att.type)) {
+            byType[key] = att;
+          }
+        }
+      });
+      return Object.values(byType);
     })();
     return {
       id: m.id,
@@ -843,7 +936,7 @@ export default function ChatApp() {
     if (error || !mediaRows?.length) return;
     const mediaAttachments = mediaRows
       .map((row) => mapMediaAttachment(row as MediaRow))
-      .filter(Boolean) as Message["attachments"];
+      .filter((item): item is Attachment => Boolean(item));
     if (!mediaAttachments.length) return;
     setMessages((prev) =>
       prev.map((m) =>
@@ -855,21 +948,34 @@ export default function ChatApp() {
   }
 
   const filteredConversations = conversations
+    .filter((c) => Boolean(c.remoteJid))
     .filter((c) => {
       const jid = c.remoteJid || "";
-      if (tab === "chats") return jid.endsWith("@s.whatsapp.net");
-      if (tab === "groups") return !jid.endsWith("@s.whatsapp.net");
+      const isWhatsappJid = jid.endsWith("@s.whatsapp.net");
+      if (tab === "chats") return isWhatsappJid;
+      if (tab === "groups") return !isWhatsappJid;
       if (tab === "archive") return false; // архив пока пустой
       return true;
     })
     .filter((c) => {
-      if (!search.trim()) return true;
-      const q = search.toLowerCase();
+      if (!debouncedSearch.trim()) return true;
+      const q = debouncedSearch.toLowerCase();
       return c.name.toLowerCase().includes(q) || c.remoteJid.toLowerCase().includes(q);
     });
 
+  const handleLoadMoreChats = () => {
+    if (loadingChats || loadingMoreChats || !hasMoreChats) return;
+    const nextPage = chatPage + 1;
+    loadChats(instanceName || null, preferredInstanceId, {
+      page: nextPage,
+      append: true,
+      search: debouncedSearch
+    });
+  };
+
   async function handleSendMessage(text: string) {
     if (!selectedConversation) return;
+    if (manualSendBlockedByAi()) return;
     const resolvedInstance = await ensureInstance();
     try {
       await sendTextMessage(resolvedInstance, {
@@ -895,6 +1001,7 @@ export default function ChatApp() {
 
   async function handleEditMessage(messageId: string, keyId: string, text: string) {
     if (!selectedConversation) return;
+    if (manualSendBlockedByAi()) return;
     const inst = await ensureInstance();
     try {
       await updateMessage(inst, {
@@ -935,6 +1042,7 @@ export default function ChatApp() {
 
   async function handleSendMedia(payload: { url: string; caption?: string }) {
     if (!selectedConversation) return;
+    if (manualSendBlockedByAi()) return;
     const inst = await ensureInstance();
     try {
       await sendMedia(inst, {
@@ -951,6 +1059,7 @@ export default function ChatApp() {
 
   async function handleSendLocation(payload: { latitude: number; longitude: number; address?: string }) {
     if (!selectedConversation) return;
+    if (manualSendBlockedByAi()) return;
     const inst = await ensureInstance();
     try {
       await sendLocation(inst, {
@@ -968,6 +1077,7 @@ export default function ChatApp() {
 
   async function handleSendContact(payload: { name: string; phone: string }) {
     if (!selectedConversation) return;
+    if (manualSendBlockedByAi()) return;
     const inst = await ensureInstance();
     try {
       await sendContact(inst, {
@@ -984,6 +1094,7 @@ export default function ChatApp() {
 
   async function handleSendReaction(payload: { emoji: string; messageId: string }) {
     if (!selectedConversation) return;
+    if (manualSendBlockedByAi()) return;
     const inst = await ensureInstance();
     try {
       await sendReaction(inst, {
@@ -1000,6 +1111,7 @@ export default function ChatApp() {
 
   async function handleSendButtons(payload: { text: string; buttons: string[] }) {
     if (!selectedConversation) return;
+    if (manualSendBlockedByAi()) return;
     const inst = await ensureInstance();
     try {
       await sendButtons(inst, {
@@ -1020,6 +1132,7 @@ export default function ChatApp() {
     sections: Array<{ title: string; rows: string[] }>;
   }) {
     if (!selectedConversation) return;
+    if (manualSendBlockedByAi()) return;
     const inst = await ensureInstance();
     try {
       await sendList(inst, {
@@ -1040,6 +1153,7 @@ export default function ChatApp() {
 
   async function handleSendPoll(payload: { name: string; options: string[] }) {
     if (!selectedConversation) return;
+    if (manualSendBlockedByAi()) return;
     const inst = await ensureInstance();
     try {
       await sendPoll(inst, {
@@ -1056,6 +1170,7 @@ export default function ChatApp() {
 
   async function handleSendMediaFile(file: File, caption?: string) {
     if (!selectedConversation) return;
+    if (manualSendBlockedByAi()) return;
     const inst = await ensureInstance();
     try {
       await sendMediaFile(inst, {
@@ -1148,6 +1263,55 @@ export default function ChatApp() {
     }
   }
 
+  async function handleToggleAi(enabled: boolean) {
+    if (!selectedConversation) return;
+    const prevValue = Boolean(selectedConversation.isAi);
+
+    const applyLocal = (value: boolean) => {
+      setSelectedConversation((prev) =>
+        prev && prev.id === selectedConversation.id ? { ...prev, isAi: value } : prev
+      );
+      setConversations((prev) =>
+        prev.map((c) => (c.id === selectedConversation.id ? { ...c, isAi: value } : c))
+      );
+    };
+
+    applyLocal(enabled);
+    setAiUpdating(true);
+    try {
+      const { error } = await supabase
+        .from("Chat")
+        .update({ is_ai: enabled, updatedAt: new Date().toISOString() })
+        .eq("id", selectedConversation.id);
+      if (error) throw error;
+      toast({
+        title: enabled ? "ИИ отвечает" : "ИИ отключен",
+        description: enabled
+          ? "Сообщения приходят автоматически, чтобы писать вручную выключите тумблер."
+          : "Режим агента активирован, можно писать."
+      });
+    } catch (err) {
+      applyLocal(prevValue);
+      toast({
+        title: "Не удалось сменить режим ИИ",
+        description: err instanceof Error ? err.message : String(err)
+      });
+    } finally {
+      setAiUpdating(false);
+    }
+  }
+
+  const aiLocked = Boolean(selectedConversation?.isAi);
+
+  const manualSendBlockedByAi = () => {
+    if (!aiLocked) return false;
+    toast({
+      title: "Сейчас отвечает ИИ",
+      description: "Выключите тумблер, чтобы отправлять сообщения вручную."
+    });
+    return true;
+  };
+
   const canSend =
     selectedConversation && selectedConversation.instanceId
       ? instanceStatuses[selectedConversation.instanceId] === "open"
@@ -1219,9 +1383,12 @@ export default function ChatApp() {
         onSearch={setSearch}
         selectedTab={tab}
         onTabChange={setTab}
-        chatsCount={conversations.filter((c) => c.remoteJid.endsWith("@s.whatsapp.net")).length}
-        groupsCount={conversations.filter((c) => !c.remoteJid.endsWith("@s.whatsapp.net")).length}
+        chatsCount={conversations.filter((c) => (c.remoteJid || "").endsWith("@s.whatsapp.net")).length}
+        groupsCount={conversations.filter((c) => !!c.remoteJid && !(c.remoteJid || "").endsWith("@s.whatsapp.net")).length}
         onSelectConversation={(c) => setSelectedConversation(c)}
+        onLoadMore={handleLoadMoreChats}
+        hasMore={hasMoreChats}
+        loadingMore={loadingMoreChats}
       />
 
       {selectedConversation ? (
@@ -1245,6 +1412,9 @@ export default function ChatApp() {
           onMarkMessagesUnread={(items) => markMessagesAsRead(items, "DELIVERY_ACK")}
           onEditMessage={(messageId, keyId, text) => handleEditMessage(messageId, keyId, text)}
           canSend={canSend}
+          isAiEnabled={aiLocked}
+          onToggleAi={handleToggleAi}
+          aiTogglePending={aiUpdating}
         />
       ) : (
         <div className="flex flex-1 items-center justify-center text-sm text-gray-500">

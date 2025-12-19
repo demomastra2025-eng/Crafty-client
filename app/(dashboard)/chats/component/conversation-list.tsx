@@ -34,6 +34,9 @@ interface ConversationListProps {
   chatsCount: number;
   groupsCount: number;
   onSelectConversation: (conversation: Conversation) => void;
+  onLoadMore: () => void;
+  hasMore: boolean;
+  loadingMore?: boolean;
 }
 
 export function ConversationList({
@@ -46,7 +49,10 @@ export function ConversationList({
   onTabChange,
   chatsCount,
   groupsCount,
-  onSelectConversation
+  onSelectConversation,
+  onLoadMore,
+  hasMore,
+  loadingMore
 }: ConversationListProps) {
   const labelColorClass = (color?: string | null) => {
     switch ((color || "").trim()) {
@@ -195,6 +201,14 @@ export function ConversationList({
             </div>
           ))
         )}
+      </div>
+      <div className="border-t border-gray-100 p-3">
+        <button
+          onClick={onLoadMore}
+          disabled={!hasMore || loadingMore}
+          className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60">
+          {loadingMore ? "Загрузка..." : hasMore ? "Показать еще 20" : "Все чаты загружены"}
+        </button>
       </div>
     </div>
   );

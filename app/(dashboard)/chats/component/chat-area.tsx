@@ -3,7 +3,7 @@
 import type React from "react";
 
 import { useEffect, useRef, useState } from "react";
-import { Info, Paperclip, Send, Tag, Pencil, Download, X } from "lucide-react";
+import { Info, Paperclip, Send, Tag, Pencil, Download, X, Sparkles } from "lucide-react";
 import { LuCheck, LuCheckCheck, LuFileImage, LuFileAudio, LuFileText, LuFileVideo } from "react-icons/lu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { Switch } from "@/components/ui/switch";
 
 interface Message {
   id: string;
@@ -52,7 +53,7 @@ interface Conversation {
   name: string;
   avatar: string;
   status: string;
-  remoteJid?: string;
+  remoteJid: string;
   lastSource?: string;
   labels?: Array<{
     labelId: string;
@@ -88,6 +89,9 @@ interface ChatAreaProps {
   onSendMediaFile: (file: File, caption?: string) => Promise<void>;
   onShowQr: () => Promise<void>;
   onEditMessage: (messageId: string, keyId: string, text: string) => Promise<void>;
+  isAiEnabled: boolean;
+  aiTogglePending?: boolean;
+  onToggleAi: (enabled: boolean) => Promise<void> | void;
 }
 
 const sourceIcon = (src?: string) => {
@@ -121,7 +125,15 @@ const statusLabel = (status?: string) => {
   }
 };
 
-const statusIcon = (status?: string, isOwn?: boolean) => {
+type StatusIconData = {
+  icon?: React.ComponentType<{ className?: string; title?: string }>;
+  className?: string;
+  title?: string;
+  sizeClass?: string;
+  text?: string;
+};
+
+const statusIcon = (status?: string, isOwn?: boolean): StatusIconData | null => {
   if (!status) return null;
   const normalized = status.toUpperCase();
   if (isOwn && (normalized === "EDIT" || normalized === "EDITED")) {
@@ -170,7 +182,10 @@ export function ChatArea({
   canSend,
   onMarkMessagesRead,
   onMarkMessagesUnread,
-  onEditMessage
+  onEditMessage,
+  isAiEnabled,
+  aiTogglePending,
+  onToggleAi
 }: ChatAreaProps) {
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
@@ -214,6 +229,7 @@ export function ChatArea({
   const [pollTitle, setPollTitle] = useState("");
   const [pollOptions, setPollOptions] = useState<string>("Вариант 1;Вариант 2");
   const { toast } = useToast();
+  const aiLocked = isAiEnabled;
   const triggerDownload = (url?: string, name?: string) => {
     if (!url) return;
     const anchor = document.createElement("a");
@@ -286,6 +302,10 @@ export function ChatArea({
     });
 
   const isSendBlocked = () => {
+    if (aiLocked) {
+      notify("Сейчас отвечает ИИ", "Выключите тумблер, чтобы написать вручную");
+      return true;
+    }
     if (!canSend) {
       notify("Нет подключения к мессенджеру");
       return true;
@@ -593,12 +613,14 @@ export function ChatArea({
                 {!message.isOwn && message.keyId ? (
                   <button
                     type="button"
-                    onClick={() =>
+                    onClick={() => {
+                      const keyId = message.keyId;
+                      if (!keyId) return;
                       (message.status === "READ" ? onMarkMessagesUnread : onMarkMessagesRead)(
-                        [{ remoteJid: conversation.remoteJid, fromMe: false, id: message.keyId as string }],
+                        [{ remoteJid: conversation.remoteJid, fromMe: false, id: keyId! }],
                         message.status === "READ" ? "DELIVERY_ACK" : undefined
-                      )
-                    }
+                      );
+                    }}
                     className="absolute -right-6 top-1/2 -translate-y-1/2 rounded-full p-1 text-gray-400 opacity-0 transition-opacity hover:text-blue-500 group-hover:opacity-100"
                     title={message.status === "READ" ? "Сделать непрочитанным" : "Отметить прочитанным"}>
                     <LuCheck className="h-4 w-4" />
@@ -607,12 +629,14 @@ export function ChatArea({
                   <div className="absolute -left-14 top-1/2 flex -translate-y-1/2 gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                     <button
                       type="button"
-                      onClick={() =>
+                      onClick={() => {
+                        const keyId = message.keyId;
+                        if (!keyId) return;
                         onMarkMessagesUnread(
-                          [{ remoteJid: conversation.remoteJid, fromMe: true, id: message.keyId as string }],
+                          [{ remoteJid: conversation.remoteJid, fromMe: true, id: keyId! }],
                           "SERVER_ACK"
-                        )
-                      }
+                        );
+                      }}
                       className="rounded-full p-1 text-gray-400 hover:text-blue-500"
                       title="Сделать непрочитанным">
                       <LuCheck className="h-4 w-4" />
@@ -701,7 +725,6 @@ export function ChatArea({
                               data={att.url}
                               type={att.mimetype || "application/pdf"}
                               className="h-64 w-full cursor-zoom-in rounded-lg border"
-                              referrerPolicy="no-referrer"
                               onClick={() =>
                                 setDocumentPreview({
                                   url: att.url as string,
@@ -776,18 +799,21 @@ export function ChatArea({
                     const iconData = statusIcon(message.status, message.isOwn);
                     if (!iconData) return null;
                     const IconComp = iconData.icon;
-                    return IconComp ? (
-                      <IconComp
-                        className={`${iconData.sizeClass || "h-3 w-3"} text-[10px] leading-none tracking-tight ${iconData.className || ""}`}
-                        title={statusLabel(message.status)}
-                      />
-                    ) : (
+                    if (IconComp) {
+                      return (
+                        <IconComp
+                          className={`${iconData.sizeClass || "h-3 w-3"} text-[10px] leading-none tracking-tight ${iconData.className || ""}`}
+                          title={statusLabel(message.status)}
+                        />
+                      );
+                    }
+                    return iconData.text ? (
                       <span
                         className={`text-[10px] leading-none tracking-tight ${iconData.className || ""}`}
                         title={statusLabel(message.status)}>
                         {iconData.text}
                       </span>
-                    );
+                    ) : null;
                   })()}
                   {message.isOwn && message.source ? <span>  {message.source}</span> : null}
                   <span>{message.timestamp}</span>
@@ -887,7 +913,7 @@ export function ChatArea({
         <form onSubmit={handleSendMessage} className="flex items-center space-x-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" disabled={!canSend || sending}>
+              <Button variant="ghost" size="sm" disabled={!canSend || sending || aiLocked}>
                 <Paperclip className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -902,17 +928,31 @@ export function ChatArea({
               <DropdownMenuItem onClick={() => setPollOpen(true)}>Опрос</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <div
+            className={`flex items-center gap-2 rounded-md border px-2 py-1 text-xs transition ${
+              aiLocked ? "border-amber-200 bg-amber-50" : "border-gray-200 bg-white"
+            }`}>
+            <Sparkles className="h-3 w-3 text-amber-500" />
+            <span className="text-[11px] font-semibold text-gray-800">ИИ</span>
+            <Switch
+              checked={isAiEnabled}
+              disabled={aiTogglePending}
+              onCheckedChange={(checked) => onToggleAi(checked)}
+            />
+          </div>
           <Input
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Написать сообщение..."
+            placeholder={
+              aiLocked ? "ИИ отвечает за чат — отключите тумблер, чтобы писать" : "Написать сообщение..."
+            }
             className="flex-1"
-            disabled={sending || !canSend}
+            disabled={sending || !canSend || aiLocked}
           />
           <Button
             type="submit"
             className="bg-blue-500 text-white hover:bg-blue-600"
-            disabled={sending || !newMessage.trim() || !canSend}>
+            disabled={sending || !newMessage.trim() || !canSend || aiLocked}>
             <Send className="h-4 w-4" />
           </Button>
         </form>

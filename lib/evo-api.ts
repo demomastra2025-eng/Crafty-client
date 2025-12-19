@@ -45,6 +45,8 @@ export type EvoInstance = {
   integration?: string;
 };
 
+type EvoInstanceApi = Omit<EvoInstance, "instanceName"> & { instanceName?: string | null };
+
 const buildQuery = (params: Record<string, string | undefined>) => {
   const search = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
@@ -90,7 +92,7 @@ export const setPreferredInstance = (payload: PreferredInstance | null) => {
 
 export const readPreferredInstance = getPreferredInstance;
 
-export async function fetchInstances() {
+export async function fetchInstances(): Promise<EvoInstance[]> {
   ensureServerEnv();
   const res = await fetch(`${evoBaseUrl()}/instance/fetchInstances`, {
     headers: evoHeaders()
@@ -100,17 +102,20 @@ export async function fetchInstances() {
     throw new Error(`fetchInstances error ${res.status}: ${body}`);
   }
   const data = await res.json();
-  const list: EvoInstance[] = Array.isArray(data)
-    ? (data as EvoInstance[])
-    : Array.isArray((data as { instances?: EvoInstance[] })?.instances)
-      ? ((data as { instances?: EvoInstance[] }).instances as EvoInstance[])
+  const list: EvoInstanceApi[] = Array.isArray(data)
+    ? (data as EvoInstanceApi[])
+    : Array.isArray((data as { instances?: EvoInstanceApi[] })?.instances)
+      ? ((data as { instances?: EvoInstanceApi[] }).instances as EvoInstanceApi[])
       : [];
-  return list
-    .map((item: EvoInstance) => ({
-      ...item,
-      instanceName: item.instanceName || item.name || item.id
-    }))
-    .filter((item: EvoInstance) => Boolean(item.instanceName));
+  const normalized = list
+    .map((item: EvoInstanceApi) => {
+      const instanceName = item.instanceName || item.name || item.id;
+      if (!instanceName) return null;
+      return { ...item, instanceName } as EvoInstance;
+    })
+    .filter((item): item is EvoInstance => Boolean(item));
+
+  return normalized;
 }
 
 export async function resolveInstance(): Promise<string | null> {
@@ -119,8 +124,9 @@ export async function resolveInstance(): Promise<string | null> {
     const list = await fetchInstances();
     const preferredAvailable =
       preferred && list.some((i) => i.instanceName === preferred) ? preferred : null;
-    const byNumber =
-      OWNER_NUMBER && list.find((i) => (i.number || "").includes(String(OWNER_NUMBER)));
+    const byNumber = OWNER_NUMBER
+      ? list.find((i) => (i.number || "").includes(String(OWNER_NUMBER)))
+      : undefined;
     const connected = list.find((i) => i.connectionStatus === "open");
     return (
       preferredAvailable ||
@@ -337,7 +343,7 @@ export async function handleLabel(instance: string, payload: HandleLabelPayload)
 export type MarkChatReadPayload = {
   remoteJid?: string;
   messageId?: string;
-  readMessages?: Array<{ remoteJid: string; fromMe: boolean; id: string }>;
+  readMessages?: boolean | Array<{ remoteJid: string; fromMe: boolean; id: string }>;
 };
 
 export async function markChatAsRead(instance: string, payload: MarkChatReadPayload) {

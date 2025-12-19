@@ -46,8 +46,8 @@ async function handler(
       status: upstream.status,
       headers: responseHeaders
     });
-  } catch (err: any) {
-    const message = err?.message || "Evolution proxy error";
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Evolution proxy error";
     console.error("Evolution proxy failed:", err);
     return NextResponse.json({ error: message }, { status: 502 });
   }

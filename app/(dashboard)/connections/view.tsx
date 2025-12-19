@@ -44,6 +44,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { formatDateTimeWithTz } from "@/lib/timezone";
 
 const quickPlatforms = [
   {
@@ -96,6 +97,19 @@ type Connector = {
     Contact?: number;
     Chat?: number;
   };
+};
+
+type ApiInstance = {
+  instanceId?: string;
+  id?: string;
+  instanceName?: string;
+  name?: string;
+  number?: string;
+  ownerJid?: string;
+  connectionStatus?: string;
+  updatedAt?: string;
+  token?: string;
+  _count?: Connector["counts"];
 };
 
 export default function ConnectorsView() {
@@ -157,7 +171,7 @@ export default function ConnectorsView() {
   async function loadInstances() {
     setLoading(true);
     try {
-      const list = await fetchInstances();
+      const list = (await fetchInstances()) as ApiInstance[];
       const base = list.map((i) => ({
         id: i.instanceId || i.id || i.instanceName || "unknown",
         instanceName: i.instanceName || i.name || "—",
@@ -166,7 +180,7 @@ export default function ConnectorsView() {
         connectionStatus: i.connectionStatus,
         updatedAt: i.updatedAt,
         token: i.token,
-        counts: (i as any)?._count
+        counts: i._count
       }));
 
       const withLiveStatus = await Promise.all(
@@ -452,13 +466,8 @@ export default function ConnectorsView() {
                       </div>
                       <p className="text-xs text-muted-foreground">
                         Обновлено:{" "}
-                        {connector.updatedAt
-                          ? new Date(connector.updatedAt).toLocaleString("ru-RU", {
-                              day: "2-digit",
-                              month: "2-digit",
-                              hour: "2-digit",
-                              minute: "2-digit"
-                            })
+                          {connector.updatedAt
+                          ? formatDateTimeWithTz(connector.updatedAt)
                           : "—"}
                       </p>
                     </div>
